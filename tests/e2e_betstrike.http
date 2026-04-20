@@ -1,0 +1,79 @@
+@resultados = http://localhost:5001
+@apostas = http://localhost:5002
+@run = {{$guid}}
+
+### 1) Criar utilizador 
+POST {{apostas}}/api/utilizadores
+Content-Type: application/json
+
+{
+  "nome": "Utilizador Teste",
+  "email": "teste.e2e+{{run}}@betstrike.local"
+}
+
+### 2) Inserir jogo na plataforma de apostas
+POST {{apostas}}/api/apostas/jogos
+Content-Type: application/json
+
+{
+  "codigoJogo": "FUT-2026-0103",
+  "dataJogo": "2026-03-29",
+  "horaInicio": "18:00:00",
+  "equipaCasa": "Benfica",
+  "equipaFora": "Porto",
+  "competicao": "Primeira Liga",
+  "estado": 1
+}
+
+### 3) Registar aposta (ajustar ids conforme respostas anteriores)
+POST {{apostas}}/api/apostas
+Content-Type: application/json
+
+{
+  "jogoId": 3,
+  "utilizadorId": 9,
+  "tipoAposta": "1",
+  "valorApostado": 10.00,
+  "oddMomento": 1.80
+}
+
+### 4) Finalizar jogo + inserir marcador no mesmo update
+PUT {{apostas}}/api/apostas/jogos/FUT-2026-0103
+Content-Type: application/json
+
+{
+  "codigoJogo": "FUT-2026-0103",
+  "estado": 3,
+  "golosCasa": 2,
+  "golosFora": 1
+}
+
+### 5) Obter aposta resolvida (ajustar apostaId)
+GET {{apostas}}/api/apostas/2
+
+### 6) Obter estatísticas do jogo
+GET {{apostas}}/api/estatisticas/jogo/FUT-2026-0103
+
+### 7) Federação - criar jogo
+POST {{resultados}}/api/jogos
+Content-Type: application/json
+
+{
+  "codigoJogo": "FUT-2026-0104",
+  "dataJogo": "2026-03-29",
+  "horaInicio": "20:00:00",
+  "equipaCasa": "Sporting",
+  "equipaFora": "Braga",
+  "estado": 1
+}
+
+### 8) Federação - atualizar para finalizado
+PUT {{resultados}}/api/jogos/FUT-2026-0104
+Content-Type: application/json
+
+{
+  "codigoJogo": "FUT-2026-0104",
+  "estado": 3,
+  "golosCasa": 1,
+  "golosFora": 1
+}
