@@ -1,10 +1,21 @@
 # Execução — Parte 1
 
+## 0) Limpeza de dados (pré-demo)
+
+Para começar do zero sem apagar schema/SPs/triggers, executa:
+
+- [database/99_Limpeza_Dados.sql](database/99_Limpeza_Dados.sql)
+
+Este script:
+- apaga dados de `ResultadosFutebol`, `Apostas` e `Pagamentos`;
+- faz reset de IDs (`DBCC CHECKIDENT`);
+- termina com uma query de validação (todos os totais a `0`).
+
 ## 1) Preparar SQL Server
 
-Opção recomendada: abrir e executar [database/00_Execucao_Ordem.sql](database/00_Execucao_Ordem.sql) com SQLCMD Mode ativo no SSMS.
 
-Se executar manualmente, usar esta ordem:
+
+Executar manualmente, com esta ordem:
 1. [database/Resultados/Tables/01_tables.sql](database/Resultados/Tables/01_tables.sql)
 2. [database/Pagamentos/Tables/01_tables.sql](database/Pagamentos/Tables/01_tables.sql)
 3. [database/Apostas/Tables/01_tables.sql](database/Apostas/Tables/01_tables.sql)
@@ -15,7 +26,7 @@ Se executar manualmente, usar esta ordem:
 
 ### VS Code (extensão SQL Server)
 
-Se estiveres a usar VS Code, executa os scripts **um a um** (o ficheiro com `:r` pode não funcionar fora do SSMS):
+Se estiveres a usar VS Code, executa os scripts **um a um**:
 
 1. Abre o ficheiro SQL.
 2. Confirma a ligação no canto inferior direito (instância correta).
@@ -69,5 +80,16 @@ Usar [tests/e2e_betstrike.http](tests/e2e_betstrike.http) por esta sequência:
 
 Executar `Federation.DataGenerator` com variável de ambiente:
 - `RESULTS_API_BASE=http://localhost:5001`
+- `BETTING_API_BASE=http://localhost:5002`
 
-A app publica calendário e depois simula 9 jogos em paralelo com atualização de 10 em 10 segundos.
+A app publica calendário nas duas APIs (Resultados e Apostas) e depois simula 9 jogos em paralelo com atualização de 10 em 10 segundos.
+
+### Demo rápida (arranque + simulação + provas SQL)
+
+Se quiseres correr tudo de uma vez:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\demo_rapida.ps1
+```
+
+
