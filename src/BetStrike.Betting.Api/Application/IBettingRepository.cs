@@ -16,6 +16,7 @@ public interface IBettingRepository
     Task<IReadOnlyList<Aposta>> ListarApostasAsync(FiltroApostas filtro, CancellationToken ct);
 
     Task<int> CriarUtilizadorAsync(CriarUtilizadorRequest request, CancellationToken ct);
+    Task<IReadOnlyList<UtilizadorComSaldo>> ListarUtilizadoresAsync(CancellationToken ct);
 
     Task<bool> InserirResultadoAsync(InserirResultadoRequest request, CancellationToken ct);
     Task<Resultado?> ObterResultadoAsync(int jogoId, CancellationToken ct);

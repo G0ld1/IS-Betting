@@ -27,6 +27,7 @@ const state = {
   bettingGames: [],
   resultsGames: [],
   bets: [],
+  users: [],
   statsGame: null,
   statsCompetition: null,
   lastCreatedUserId: null,
@@ -154,6 +155,17 @@ function normalizeBet(bet) {
     OddMomento: pickValue(bet, "OddMomento", "oddMomento"),
     Estado: pickValue(bet, "Estado", "estado"),
     DataHoraUtc: pickValue(bet, "DataHoraUtc", "dataHoraUtc"),
+  };
+}
+
+function normalizeUser(user) {
+  return {
+    Id: pickValue(user, "Id", "id"),
+    Nome: pickValue(user, "Nome", "nome"),
+    Email: pickValue(user, "Email", "email"),
+    SaldoDisponivel: pickValue(user, "SaldoDisponivel", "saldoDisponivel"),
+    SaldoGastoTotal: pickValue(user, "SaldoGastoTotal", "saldoGastoTotal"),
+    CriadoEmUtc: pickValue(user, "CriadoEmUtc", "criadoEmUtc"),
   };
 }
 
@@ -345,15 +357,17 @@ async function loadData() {
     requestJson(bettingBase, "/api/apostas/jogos").catch((error) => ({ __error: error, source: "bettingGames" })),
     requestJson(resultsBase, "/api/jogos").catch((error) => ({ __error: error, source: "resultsGames" })),
     requestJson(bettingBase, "/api/apostas").catch((error) => ({ __error: error, source: "bets" })),
+    requestJson(bettingBase, "/api/utilizadores").catch((error) => ({ __error: error, source: "users" })),
   ];
 
-  const [bettingGames, resultsGames, bets] = await Promise.all(tasks);
+  const [bettingGames, resultsGames, bets, users] = await Promise.all(tasks);
 
   state.bettingGames = Array.isArray(bettingGames) ? bettingGames.map(normalizeBettingGame) : [];
   state.resultsGames = Array.isArray(resultsGames) ? resultsGames.map(normalizeFederationGame) : [];
   state.bets = Array.isArray(bets) ? bets.map(normalizeBet) : [];
+  state.users = Array.isArray(users) ? users.map(normalizeUser) : [];
 
-  const errors = [bettingGames, resultsGames, bets].filter((item) => item && item.__error);
+  const errors = [bettingGames, resultsGames, bets, users].filter((item) => item && item.__error);
   if (errors.length > 0) {
     setConnectionState("partial");
     appendLog("warning", "Algumas consultas falharam", errors[0].__error?.message || "Erro inesperado.");
@@ -395,6 +409,7 @@ function renderAll() {
   renderSummary();
   renderGames();
   renderBets();
+  renderUsers();
   renderDynamicFormOptions();
   renderStatsPanel();
 }
@@ -535,6 +550,28 @@ function renderBets() {
         )
         .join("")
     : '<tr><td colspan="9" class="empty-state">Ainda não há apostas carregadas.</td></tr>';
+}
+
+function renderUsers() {
+  elements.usersCount.textContent = `${state.users.length} registos`;
+  elements.usersBody.innerHTML = state.users.length
+    ? state.users
+        .slice()
+        .sort((left, right) => Number(left.Id) - Number(right.Id))
+        .map(
+          (user) => `
+            <tr>
+              <td>${user.Id}</td>
+              <td>${escapeHtml(user.Nome || "—")}</td>
+              <td>${escapeHtml(user.Email || "—")}</td>
+              <td>${formatCurrency(user.SaldoDisponivel)}</td>
+              <td>${formatCurrency(user.SaldoGastoTotal)}</td>
+              <td>${formatDate(user.CriadoEmUtc)}</td>
+            </tr>
+          `
+        )
+        .join("")
+    : '<tr><td colspan="6" class="empty-state">Sem utilizadores carregados.</td></tr>';
 }
 
 function renderStatsPanel() {
@@ -948,6 +985,8 @@ function hydrateElements() {
   elements.resultsGamesBody = document.getElementById("resultsGamesBody");
   elements.betsCount = document.getElementById("betsCount");
   elements.betsBody = document.getElementById("betsBody");
+  elements.usersCount = document.getElementById("usersCount");
+  elements.usersBody = document.getElementById("usersBody");
   elements.activityLog = document.getElementById("activityLog");
   elements.statsGameCode = document.getElementById("statsGameCode");
   elements.statsGameState = document.getElementById("statsGameState");

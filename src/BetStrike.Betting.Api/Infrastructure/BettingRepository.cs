@@ -133,6 +133,27 @@ public sealed class BettingRepository(IConfiguration configuration) : IBettingRe
             cancellationToken: ct));
     }
 
+    public async Task<IReadOnlyList<UtilizadorComSaldo>> ListarUtilizadoresAsync(CancellationToken ct)
+    {
+        using var db = Open();
+        
+        const string sql = @"
+            SELECT 
+                u.Id,
+                u.Nome,
+                u.Email,
+                0 AS SaldoDisponivel,
+                COALESCE(SUM(a.ValorApostado), 0) AS SaldoGastoTotal,
+                u.CriadoEmUtc
+            FROM dbo.Utilizador u
+            LEFT JOIN dbo.Aposta a ON u.Id = a.UtilizadorId
+            GROUP BY u.Id, u.Nome, u.Email, u.CriadoEmUtc
+            ORDER BY u.Id DESC";
+
+        var rows = await db.QueryAsync<UtilizadorComSaldo>(new CommandDefinition(sql, cancellationToken: ct));
+        return rows.ToList();
+    }
+
     public async Task<bool> InserirResultadoAsync(InserirResultadoRequest request, CancellationToken ct)
     {
         using var db = Open();

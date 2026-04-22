@@ -9,6 +9,13 @@ namespace BetStrike.Betting.Api.Controllers;
 [Route("api/utilizadores")]
 public sealed class UtilizadoresController(IBettingService service) : ControllerBase
 {
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<UtilizadorComSaldo>>> Listar(CancellationToken ct)
+    {
+        var utilizadores = await service.ListarUtilizadoresAsync(ct);
+        return Ok(utilizadores);
+    }
+
     [HttpPost]
     public async Task<ActionResult<int>> Criar([FromBody] CriarUtilizadorRequest request, CancellationToken ct)
     {

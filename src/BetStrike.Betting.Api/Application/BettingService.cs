@@ -55,6 +55,9 @@ public sealed class BettingService(IBettingRepository repository) : IBettingServ
         return repository.CriarUtilizadorAsync(request, ct);
     }
 
+    public Task<IReadOnlyList<UtilizadorComSaldo>> ListarUtilizadoresAsync(CancellationToken ct)
+        => repository.ListarUtilizadoresAsync(ct);
+
     public Task<bool> InserirResultadoAsync(InserirResultadoRequest request, CancellationToken ct)
         => repository.InserirResultadoAsync(request, ct);
 

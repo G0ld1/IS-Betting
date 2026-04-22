@@ -22,3 +22,13 @@ public sealed record InserirResultadoRequest(int JogoId, int GolosCasa, int Golo
 public sealed record FiltroJogos(DateOnly? Data, int? Estado, string? Competicao);
 
 public sealed record FiltroApostas(int? UtilizadorId, int? JogoId, int? Estado, DateTime? InicioUtc, DateTime? FimUtc);
+
+public sealed class UtilizadorComSaldo
+{
+    public int Id { get; set; }
+    public string Nome { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public decimal SaldoDisponivel { get; set; }
+    public decimal SaldoGastoTotal { get; set; }
+    public DateTime CriadoEmUtc { get; set; }
+}
