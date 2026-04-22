@@ -92,6 +92,43 @@ select {
   background: rgba(124, 240, 199, 0.16);
 }
 
+.quick-nav {
+  position: sticky;
+  top: 12px;
+  z-index: 25;
+  margin-bottom: 18px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(9, 15, 27, 0.88);
+  backdrop-filter: blur(16px);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-nav a {
+  padding: 0.58rem 0.88rem;
+  border-radius: 999px;
+  border: 1px solid rgba(173, 191, 255, 0.16);
+  background: rgba(15, 24, 42, 0.6);
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+
+.quick-nav a:hover {
+  color: var(--text);
+  border-color: rgba(124, 240, 199, 0.4);
+  background: rgba(124, 240, 199, 0.12);
+}
+
+.hero[id],
+.content-card[id] {
+  scroll-margin-top: 96px;
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1.45fr 0.95fr;
@@ -669,6 +706,18 @@ tbody tr:hover td {
   .page-shell {
     width: min(calc(100% - 20px), var(--max-width));
     padding-top: 12px;
+  }
+
+  .quick-nav {
+    position: sticky;
+    top: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+  }
+
+  .quick-nav a {
+    white-space: nowrap;
   }
 
   .hero-copy,
