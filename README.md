@@ -30,8 +30,21 @@ Ver [docs/EXECUCAO_PARTE1.md](docs/EXECUCAO_PARTE1.md) para:
 
 ## Front end
 
-O novo site está em [frontend/index.html](frontend/index.html) e fala diretamente com:
-- `http://localhost:5001` para a API da Federação;
-- `http://localhost:5002` para a API de Apostas.
+O novo site está em [frontend/index.html](frontend/index.html) e comunica com as APIs em tempo real.
 
-Para o abrir localmente, serve a pasta `frontend/` com um servidor estático e entra no `index.html`.
+### Configuração necessária:
+
+**As seguintes APIs devem estar a rodar:**
+- `http://localhost:5001` — API da Federação (jogos e resultados)
+- `http://localhost:5002` — API de Apostas (gestão de apostas)
+
+**O frontend é servido na porta `8080`:**
+
+```powershell
+Set-Location frontend
+python -m http.server 8080
+```
+
+Depois abre `http://localhost:8080` no browser.
+
+O frontend acede aos dados dos jogos e das apostas através das APIs em 5001 e 5002.
