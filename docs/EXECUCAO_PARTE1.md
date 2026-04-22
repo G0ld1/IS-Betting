@@ -1,17 +1,29 @@
 # Execução — Parte 1
 
-## 0) Limpeza de dados (pré-demo)
+## Criação Rápida de base de Dados 
 
-Para começar do zero sem apagar schema/SPs/triggers, executa:
+Para criação de bases de dados e arranque das APIs, use:
 
-- [database/99_Limpeza_Dados.sql](database/99_Limpeza_Dados.sql)
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\preparar_entrega_professor.ps1
+```
 
-Este script:
-- apaga dados de `ResultadosFutebol`, `Apostas` e `Pagamentos`;
-- faz reset de IDs (`DBCC CHECKIDENT`);
-- termina com uma query de validação (todos os totais a `0`).
+O script faz automaticamente:
+- criação/atualização de tabelas, SPs e trigger;
+- limpeza de dados antigos;
+- arranque das APIs (5001 e 5002);
+- injeção de dados de demo (jogos, utilizadores, apostas e resultados).
 
-## 1) Preparar SQL Server
+No fim, basta servir o frontend:
+
+```powershell
+Set-Location frontend
+python -m http.server 8080
+```
+
+Abrir `http://localhost:8080`.
+
+## 1) Preparar SQL Server (manualmente)
 
 
 
@@ -34,26 +46,6 @@ Se estiveres a usar VS Code, executa os scripts **um a um**:
 4. Repete para os 7 ficheiros na ordem acima.
 5. No painel de bases, faz `Refresh`.
 
-Validação rápida (executar numa query):
-
-```sql
-SELECT @@SERVERNAME AS ServerName, DB_NAME() AS CurrentDb;
-
-SELECT TABLE_SCHEMA, TABLE_NAME
-FROM Apostas.INFORMATION_SCHEMA.TABLES
-WHERE TABLE_TYPE = 'BASE TABLE'
-ORDER BY TABLE_SCHEMA, TABLE_NAME;
-
-SELECT TABLE_SCHEMA, TABLE_NAME
-FROM Pagamentos.INFORMATION_SCHEMA.TABLES
-WHERE TABLE_TYPE = 'BASE TABLE'
-ORDER BY TABLE_SCHEMA, TABLE_NAME;
-
-SELECT TABLE_SCHEMA, TABLE_NAME
-FROM ResultadosFutebol.INFORMATION_SCHEMA.TABLES
-WHERE TABLE_TYPE = 'BASE TABLE'
-ORDER BY TABLE_SCHEMA, TABLE_NAME;
-```
 
 ## 2) Confirmar connection strings
 
@@ -76,22 +68,11 @@ Usar [tests/e2e_betstrike.http](tests/e2e_betstrike.http) por esta sequência:
 5. Verificar aposta resolvida (`Estado=2` ganha ou `Estado=3` perdida).
 6. Verificar crédito em `Pagamentos.dbo.Transacao` (`PG`) e saldo atualizado em `Pagamentos.dbo.Saldo_Utilizador`.
 
-## 5) Simulação automática (opcional)
 
-Executar `Federation.DataGenerator` com variável de ambiente:
-- `RESULTS_API_BASE=http://localhost:5001`
-- `BETTING_API_BASE=http://localhost:5002`
+### Demo rápida 
 
-A app publica calendário nas duas APIs (Resultados e Apostas) e depois simula 9 jogos em paralelo com atualização de 10 em 10 segundos.
-
-### Demo rápida (arranque + simulação + provas SQL)
-
-Se quiseres correr tudo de uma vez:
+Se quiseres correr uma jornada simulada:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\demo_rapida.ps1
 ```
-
-Rodar o Frontend:
-Set-Location C:\Users\rafae\Desktop\IS-Betting\frontend
->> python -m http.server 8080

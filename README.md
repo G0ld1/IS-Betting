@@ -1,6 +1,5 @@
 # BetStrike — Parte 1 (Integração REST + SQL Server)
 
-Estrutura base para a modernização da plataforma em C# / ASP.NET Core / SQL Server, alinhada com os requisitos fornecidos.
 
 ## Estrutura
 
@@ -14,9 +13,9 @@ Estrutura base para a modernização da plataforma em C# / ASP.NET Core / SQL Se
 
 ## Princípios aplicados
 
-- Toda a camada de dados usa **Stored Procedures** (sem SQL inline para operações de negócio).
+- Toda a camada de dados usa **Stored Procedures** .
 - Validações críticas em **BD** e reforçadas na **API**.
-- Fluxo assíncrono para simulação de 9 jogos em paralelo (atualizações a cada 10s).
+- Fluxo assíncrono para simulação de 9 jogos em paralelo .
 - Contratos REST explícitos para sincronização entre plataformas.
 
 
@@ -28,9 +27,19 @@ Ver [docs/EXECUCAO_PARTE1.md](docs/EXECUCAO_PARTE1.md) para:
 - arranque das APIs com portas fixas;
 - teste fim-a-fim com requests HTTP.
 
+### Criação Rápida de Bases de Dados e Arranque de APIs
+
+Para deixar a aplicação pronta para execução:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\preparar_entrega_professor.ps1
+```
+
+Depois, abrir o frontend em `http://localhost:8080`.
+
 ## Front end
 
-O novo site está em [frontend/index.html](frontend/index.html) e comunica com as APIs em tempo real.
+O site está em [frontend/index.html](frontend/index.html) e comunica com as APIs em tempo real.
 
 ### Configuração necessária:
 

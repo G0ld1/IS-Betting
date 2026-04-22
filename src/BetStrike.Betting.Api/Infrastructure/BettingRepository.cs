@@ -142,12 +142,13 @@ public sealed class BettingRepository(IConfiguration configuration) : IBettingRe
                 u.Id,
                 u.Nome,
                 u.Email,
-                0 AS SaldoDisponivel,
+                COALESCE(su.SaldoAtual, 0) AS SaldoDisponivel,
                 COALESCE(SUM(a.ValorApostado), 0) AS SaldoGastoTotal,
                 u.CriadoEmUtc
             FROM dbo.Utilizador u
+            LEFT JOIN Pagamentos.dbo.Saldo_Utilizador su ON su.UtilizadorId = u.Id
             LEFT JOIN dbo.Aposta a ON u.Id = a.UtilizadorId
-            GROUP BY u.Id, u.Nome, u.Email, u.CriadoEmUtc
+            GROUP BY u.Id, u.Nome, u.Email, su.SaldoAtual, u.CriadoEmUtc
             ORDER BY u.Id DESC";
 
         var rows = await db.QueryAsync<UtilizadorComSaldo>(new CommandDefinition(sql, cancellationToken: ct));
