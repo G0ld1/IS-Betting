@@ -43,8 +43,8 @@ Content-Type: application/json
 
 {
   "codigoJogo": "FUT-2026-0106",
-  "estado": 3,
- "golosCasa": 2,
+  "estado": 4,
+  "golosCasa": 2,
   "golosFora": 1
 }
 

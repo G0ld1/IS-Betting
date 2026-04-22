@@ -7,6 +7,7 @@ Estrutura base para a modernização da plataforma em C# / ASP.NET Core / SQL Se
 - `src/Federation.Results.Api` — API REST da Federação (jogos e resultados)
 - `src/BetStrike.Betting.Api` — API REST de gestão de apostas
 - `src/Federation.DataGenerator` — aplicação de geração de calendário e simulação em tempo fictício
+- `frontend/` — site front end para operações e monitorização
 - `database/Apostas` — esquema e stored procedures da BD `Apostas`
 - `database/Pagamentos` — esquema e stored procedures da BD `Pagamentos`
 - `database/Integration/Triggers` — trigger de integração entre apostas e pagamentos
@@ -26,3 +27,11 @@ Ver [docs/EXECUCAO_PARTE1.md](docs/EXECUCAO_PARTE1.md) para:
 - ordem exata de execução dos scripts SQL;
 - arranque das APIs com portas fixas;
 - teste fim-a-fim com requests HTTP.
+
+## Front end
+
+O novo site está em [frontend/index.html](frontend/index.html) e fala diretamente com:
+- `http://localhost:5001` para a API da Federação;
+- `http://localhost:5002` para a API de Apostas.
+
+Para o abrir localmente, serve a pasta `frontend/` com um servidor estático e entra no `index.html`.

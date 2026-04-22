@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>BetStrike Control Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="backdrop backdrop-a"></div>
+      <div class="backdrop backdrop-b"></div>
+
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">BetStrike • Front end operacional</p>
+          <h1>Control Room para jogos, apostas e resultados.</h1>
+          <p class="lead">
+            Uma interface única para acompanhar a Federação, gerir jogos na plataforma de apostas,
+            registar utilizadores, lançar apostas e consultar estatísticas em tempo real.
+          </p>
+
+          <div class="hero-actions">
+            <button class="button primary" id="refreshButton" type="button">Atualizar dados</button>
+            <a class="button secondary" id="swaggerBettingLink" href="http://localhost:5002/swagger" target="_blank" rel="noreferrer">Swagger Apostas</a>
+            <a class="button secondary" id="swaggerResultsLink" href="http://localhost:5001/swagger" target="_blank" rel="noreferrer">Swagger Federação</a>
+          </div>
+        </div>
+
+        <aside class="hero-panel">
+          <div class="panel-card panel-card-tight">
+            <div class="panel-row">
+              <div>
+                <span class="label">API Apostas</span>
+                <strong id="bettingBaseLabel">http://localhost:5002</strong>
+              </div>
+              <span class="status-dot ok" id="bettingStatusDot">online</span>
+            </div>
+            <div class="panel-row">
+              <div>
+                <span class="label">API Federação</span>
+                <strong id="resultsBaseLabel">http://localhost:5001</strong>
+              </div>
+              <span class="status-dot ok" id="resultsStatusDot">online</span>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <span class="label">Resumo</span>
+            <div class="mini-grid">
+              <div>
+                <strong id="summaryBettingGames">0</strong>
+                <span>Jogos Apostas</span>
+              </div>
+              <div>
+                <strong id="summaryResultsGames">0</strong>
+                <span>Jogos Federação</span>
+              </div>
+              <div>
+                <strong id="summaryBets">0</strong>
+                <span>Apostas</span>
+              </div>
+              <div>
+                <strong id="summaryStake">0€</strong>
+                <span>Total Apostado</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </header>
+
+      <main class="content-grid">
+        <section class="content-card settings-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Configuração</p>
+              <h2>Endereços das APIs</h2>
+            </div>
+            <p class="section-note">Os valores ficam guardados localmente no browser.</p>
+          </div>
+
+          <form id="settingsForm" class="settings-form">
+            <label>
+              <span>API Apostas</span>
+              <input id="bettingApiBase" type="url" placeholder="http://localhost:5002" />
+            </label>
+            <label>
+              <span>API Federação</span>
+              <input id="resultsApiBase" type="url" placeholder="http://localhost:5001" />
+            </label>
+            <div class="settings-actions">
+              <button class="button primary" type="submit">Guardar e recarregar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="content-card metrics-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Métricas</p>
+              <h2>Estado atual da plataforma</h2>
+            </div>
+            <p class="section-note" id="lastUpdated">A aguardar primeiro carregamento.</p>
+          </div>
+
+          <div class="metrics-grid" id="metricsGrid">
+            <article class="metric-tile accent-a">
+              <span>Jogos ativos</span>
+              <strong id="metricActiveGames">0</strong>
+              <small>Jogos em curso ou agendados para hoje</small>
+            </article>
+            <article class="metric-tile accent-b">
+              <span>Apostas pendentes</span>
+              <strong id="metricPendingBets">0</strong>
+              <small>Apostas ainda por resolver</small>
+            </article>
+            <article class="metric-tile accent-c">
+              <span>Apostas ganhas</span>
+              <strong id="metricWonBets">0</strong>
+              <small>Resultados positivos resolvidos</small>
+            </article>
+            <article class="metric-tile accent-d">
+              <span>Competição em foco</span>
+              <strong id="metricCompetition">—</strong>
+              <small id="metricCompetitionDetail">Consulta estatística por competição</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="content-card table-card wide-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Jogos</p>
+              <h2>Plataforma de apostas e federação</h2>
+            </div>
+            <div class="inline-actions">
+              <button class="chip" type="button" data-filter="all">Todos</button>
+              <button class="chip" type="button" data-filter="active">Em curso</button>
+              <button class="chip" type="button" data-filter="finished">Finalizados</button>
+            </div>
+          </div>
+
+          <div class="split-columns">
+            <div>
+              <div class="subheading">
+                <h3>Jogos na API de Apostas</h3>
+                <span id="bettingGamesCount">0 registos</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Competição</th>
+                      <th>Confronto</th>
+                      <th>Data</th>
+                      <th>Estado</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bettingGamesBody">
+                    <tr><td colspan="5" class="empty-state">Sem dados carregados.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <div class="subheading">
+                <h3>Jogos na API da Federação</h3>
+                <span id="resultsGamesCount">0 registos</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Confronto</th>
+                      <th>Data</th>
+                      <th>Placar</th>
+                      <th>Estado</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="resultsGamesBody">
+                    <tr><td colspan="5" class="empty-state">Sem dados carregados.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-card form-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Ações rápidas</p>
+              <h2>Operações principais</h2>
+            </div>
+            <p class="section-note">Tudo chama as APIs diretamente.</p>
+          </div>
+
+          <div class="form-grid">
+            <form id="createUserForm" class="action-form">
+              <h3>Novo utilizador</h3>
+              <label>
+                <span>Nome</span>
+                <input name="nome" type="text" placeholder="Maria Silva" required />
+              </label>
+              <label>
+                <span>Email</span>
+                <input name="email" type="email" placeholder="maria@example.com" required />
+              </label>
+              <button class="button primary" type="submit">Criar utilizador</button>
+            </form>
+
+            <form id="createBettingGameForm" class="action-form">
+              <h3>Novo jogo na Apostas</h3>
+              <div class="two-col">
+                <label>
+                  <span>Código</span>
+                  <input name="codigoJogo" type="text" placeholder="FUT-2026-0001" required />
+                </label>
+                <label>
+                  <span>Data</span>
+                  <input name="dataJogo" type="date" required />
+                </label>
+              </div>
+              <div class="two-col">
+                <label>
+                  <span>Hora</span>
+                  <input name="horaInicio" type="time" required />
+                </label>
+                <label>
+                  <span>Competição</span>
+                  <input name="competicao" type="text" placeholder="Primeira Liga" required />
+                </label>
+              </div>
+              <div class="two-col">
+                <label>
+                  <span>Casa</span>
+                  <input name="equipaCasa" type="text" placeholder="Benfica" required />
+                </label>
+                <label>
+                  <span>Fora</span>
+                  <input name="equipaFora" type="text" placeholder="Porto" required />
+                </label>
+              </div>
+              <label>
+                <span>Estado</span>
+                <select name="estado">
+                  <option value="1">Agendado</option>
+                  <option value="2">Em curso</option>
+                  <option value="3">Finalizado</option>
+                  <option value="4">Cancelado</option>
+                  <option value="5">Adiado</option>
+                </select>
+              </label>
+              <button class="button primary" type="submit">Criar jogo</button>
+            </form>
+
+            <form id="createFederationGameForm" class="action-form">
+              <h3>Novo jogo na Federação</h3>
+              <div class="two-col">
+                <label>
+                  <span>Código</span>
+                  <input name="codigoJogo" type="text" placeholder="FUT-2026-1001" required />
+                </label>
+                <label>
+                  <span>Data</span>
+                  <input name="dataJogo" type="date" required />
+                </label>
+              </div>
+              <div class="two-col">
+                <label>
+                  <span>Hora</span>
+                  <input name="horaInicio" type="time" required />
+                </label>
+                <label>
+                  <span>Estado</span>
+                  <select name="estado">
+                    <option value="1">Agendado</option>
+                    <option value="2">Em curso</option>
+                    <option value="3">Finalizado</option>
+                    <option value="4">Cancelado</option>
+                    <option value="5">Adiado</option>
+                  </select>
+                </label>
+              </div>
+              <div class="two-col">
+                <label>
+                  <span>Casa</span>
+                  <input name="equipaCasa" type="text" placeholder="Sporting" required />
+                </label>
+                <label>
+                  <span>Fora</span>
+                  <input name="equipaFora" type="text" placeholder="Braga" required />
+                </label>
+              </div>
+              <button class="button primary" type="submit">Criar jogo</button>
+            </form>
+
+            <form id="registerBetForm" class="action-form">
+              <h3>Registar aposta</h3>
+              <div class="two-col">
+                <label>
+                  <span>Jogo ID</span>
+                  <select id="registerBetGameId" name="jogoId" required>
+                    <option value="">Seleciona um jogo da API de Apostas</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Utilizador ID</span>
+                  <input id="registerBetUserId" name="utilizadorId" type="number" min="1" required />
+                  <small id="lastCreatedUserHint">Cria um utilizador para obter o ID.</small>
+                </label>
+              </div>
+              <div class="two-col">
+                <label>
+                  <span>Tipo</span>
+                  <select name="tipoAposta">
+                    <option value="1">Casa</option>
+                    <option value="X">Empate</option>
+                    <option value="2">Fora</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Odd</span>
+                  <input name="oddMomento" type="number" min="1.01" step="0.01" value="1.80" required />
+                </label>
+              </div>
+              <label>
+                <span>Valor apostado</span>
+                <input name="valorApostado" type="number" min="0.01" step="0.01" value="10.00" required />
+              </label>
+              <button class="button primary" type="submit">Registar aposta</button>
+            </form>
+
+            <form id="insertResultForm" class="action-form">
+              <h3>Inserir resultado</h3>
+              <div class="two-col">
+                <label>
+                  <span>Jogo ID</span>
+                  <select id="insertResultGameId" name="jogoId" required>
+                    <option value="">Seleciona um jogo da API de Apostas</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Golos casa</span>
+                  <input name="golosCasa" type="number" min="0" required />
+                </label>
+              </div>
+              <label>
+                <span>Golos fora</span>
+                <input name="golosFora" type="number" min="0" required />
+              </label>
+              <button class="button primary" type="submit">Inserir resultado</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="content-card stats-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Estatísticas</p>
+              <h2>Leitura por jogo e por competição</h2>
+            </div>
+            <p class="section-note">Consulta os dados a partir de um código de jogo ou nome de competição.</p>
+          </div>
+
+          <div class="stats-layout">
+            <form id="statsForm" class="action-form compact-form">
+              <label>
+                <span>Código do jogo</span>
+                <input name="codigoJogo" type="text" placeholder="FUT-2026-0001" />
+              </label>
+              <label>
+                <span>Competição</span>
+                <input name="competicao" type="text" placeholder="Primeira Liga" />
+              </label>
+              <button class="button primary" type="submit">Carregar estatísticas</button>
+            </form>
+
+            <div class="stats-panels">
+              <article class="panel-card">
+                <div class="panel-row">
+                  <div>
+                    <span class="label">Por jogo</span>
+                    <strong id="statsGameCode">—</strong>
+                  </div>
+                  <span class="status-dot" id="statsGameState">aguarda pesquisa</span>
+                </div>
+                <div class="stats-grid" id="gameStatsGrid">
+                  <div><span>Total apostado</span><strong>—</strong></div>
+                  <div><span>Casa</span><strong>—</strong></div>
+                  <div><span>Empate</span><strong>—</strong></div>
+                  <div><span>Fora</span><strong>—</strong></div>
+                  <div><span>Pendentes</span><strong>—</strong></div>
+                  <div><span>Margem</span><strong>—</strong></div>
+                </div>
+              </article>
+
+              <article class="panel-card">
+                <div class="panel-row">
+                  <div>
+                    <span class="label">Por competição</span>
+                    <strong id="statsCompetitionCode">—</strong>
+                  </div>
+                  <span class="status-dot" id="statsCompetitionState">aguarda pesquisa</span>
+                </div>
+                <pre id="competitionStatsOutput" class="json-output">{}</pre>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-card table-card wide-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Apostas</p>
+              <h2>Movimento mais recente</h2>
+            </div>
+            <span id="betsCount">0 registos</span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Jogo</th>
+                  <th>Utilizador</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                  <th>Odd</th>
+                  <th>Estado</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="betsBody">
+                <tr><td colspan="8" class="empty-state">Sem dados carregados.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="content-card log-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Resultado</p>
+              <h2>Estado das operações</h2>
+            </div>
+            <p class="section-note">Cada ação aparece aqui com o payload devolvido pela API.</p>
+          </div>
+          <div id="activityLog" class="activity-log">
+            <div class="log-entry neutral">Aguardando interação.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

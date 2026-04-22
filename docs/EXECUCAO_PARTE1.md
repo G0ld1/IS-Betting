@@ -92,4 +92,6 @@ Se quiseres correr tudo de uma vez:
 powershell -ExecutionPolicy Bypass -File .\scripts\demo_rapida.ps1
 ```
 
-
+Rodar o Frontend:
+Set-Location C:\Users\rafae\Desktop\IS-Betting\frontend
+>> python -m http.server 8080
