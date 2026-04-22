@@ -54,7 +54,7 @@ function Pause-Step {
 $resultsProc = $null
 $bettingProc = $null
 
-try {
+
     Pause-Step -Message "Iniciar demo"
 
     Write-Host "[1/5] Arrancar Results API ($ResultsApiBase)..."
@@ -167,7 +167,7 @@ ORDER BY Id DESC;
     Write-Host ""
     Write-Host "Demo concluida com sucesso."
 
-finally {
+
     if ($resultsProc -and -not $resultsProc.HasExited) {
         Stop-Process -Id $resultsProc.Id -Force
     }
@@ -175,4 +175,5 @@ finally {
     if ($bettingProc -and -not $bettingProc.HasExited) {
         Stop-Process -Id $bettingProc.Id -Force
     }
-}
+
+

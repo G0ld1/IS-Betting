@@ -7,8 +7,8 @@ POST {{apostas}}/api/utilizadores
 Content-Type: application/json
 
 {
-  "nome": "Utilizador Teste",
-  "email": "teste.e2e+{{run}}@betstrike.local"
+  "nome": "Nome Fixe",
+  "email": "NomeFixe.e2e+{{run}}@betstrike.local"
 }
 
 ### 2) Inserir jogo na plataforma de apostas
@@ -16,8 +16,8 @@ POST {{apostas}}/api/apostas/jogos
 Content-Type: application/json
 
 {
-  "codigoJogo": "FUT-2026-0103",
-  "dataJogo": "2026-03-29",
+  "codigoJogo": "FUT-2026-5402",
+  "dataJogo": "2026-06-29",
   "horaInicio": "18:00:00",
   "equipaCasa": "Benfica",
   "equipaFora": "Porto",
@@ -38,13 +38,13 @@ Content-Type: application/json
 }
 
 ### 4) Finalizar jogo + inserir marcador no mesmo update
-PUT {{apostas}}/api/apostas/jogos/FUT-2026-0103
+PUT {{apostas}}/api/apostas/jogos/FUT-2026-0106
 Content-Type: application/json
 
 {
-  "codigoJogo": "FUT-2026-0103",
+  "codigoJogo": "FUT-2026-0106",
   "estado": 3,
-  "golosCasa": 2,
+ "golosCasa": 2,
   "golosFora": 1
 }
 
