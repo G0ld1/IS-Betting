@@ -1,0 +1,6 @@
+**/bin
+**/obj
+.git
+.vs
+logs
+frontend/node_modules

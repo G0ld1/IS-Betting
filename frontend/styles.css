@@ -485,8 +485,70 @@ textarea:focus {
   box-shadow: inset 0 1px 0 rgba(255, 122, 144, 0.14);
 }
 
+.analytics-card {
+  display: grid;
+  gap: 18px;
+}
+
+.analytics-banner {
+  padding: 18px;
+}
+
+.analytics-inline strong {
+  font-size: 1.2rem;
+}
+
+.analytics-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.feed-list {
+  display: grid;
+  gap: 12px;
+}
+
+.feed-item {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(173, 191, 255, 0.12);
+  background: rgba(8, 14, 25, 0.55);
+}
+
+.feed-item strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.feed-item small {
+  display: block;
+  color: var(--muted-strong);
+  line-height: 1.5;
+}
+
+.feed-item.alert-alta {
+  border-color: rgba(255, 122, 144, 0.35);
+}
+
+.feed-item.alert-média,
+.feed-item.alert-media {
+  border-color: rgba(255, 191, 105, 0.35);
+}
+
+.feed-item.alert-baixa {
+  border-color: rgba(126, 167, 255, 0.3);
+}
+
 .split-columns {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.analytics-columns {
+  align-items: start;
+}
+
+.analytics-subheading {
+  margin-top: 18px;
 }
 
 .subheading {
@@ -687,7 +749,8 @@ tbody tr:hover td {
   .split-columns,
   .settings-form,
   .form-grid,
-  .metrics-grid {
+  .metrics-grid,
+  .analytics-grid {
     grid-template-columns: 1fr;
   }
 

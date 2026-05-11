@@ -23,4 +23,8 @@ public interface IBettingRepository
 
     Task<EstatisticasJogo?> EstatisticasJogoAsync(string codigoJogo, CancellationToken ct);
     Task<object?> EstatisticasCompeticaoAsync(string competicao, CancellationToken ct);
+
+    Task<DashboardSnapshot> ObterDashboardAsync(CancellationToken ct);
+    Task<IReadOnlyList<DashboardAlerta>> ListarAlertasAsync(int limite, CancellationToken ct);
+    Task<IReadOnlyList<DashboardEvento>> ListarEventosAsync(int limite, CancellationToken ct);
 }

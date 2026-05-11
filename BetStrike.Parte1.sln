@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetStrike.Betting.Api", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Federation.DataGenerator", "src\Federation.DataGenerator\Federation.DataGenerator.csproj", "{A4CCB0BC-3AC3-4D93-A31E-91A685A5B13F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetStrike.Middleware.Contracts", "src\BetStrike.Middleware.Contracts\BetStrike.Middleware.Contracts.csproj", "{6B56B8EA-9A9F-4E5A-8B72-8F3E8DAF8A11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetStrike.Middleware.Worker", "src\BetStrike.Middleware.Worker\BetStrike.Middleware.Worker.csproj", "{F4B0C4C5-19AC-4F7B-8C0F-5C5D3A8A1A22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +30,14 @@ Global
 		{A4CCB0BC-3AC3-4D93-A31E-91A685A5B13F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4CCB0BC-3AC3-4D93-A31E-91A685A5B13F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4CCB0BC-3AC3-4D93-A31E-91A685A5B13F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B56B8EA-9A9F-4E5A-8B72-8F3E8DAF8A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B56B8EA-9A9F-4E5A-8B72-8F3E8DAF8A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B56B8EA-9A9F-4E5A-8B72-8F3E8DAF8A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B56B8EA-9A9F-4E5A-8B72-8F3E8DAF8A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4B0C4C5-19AC-4F7B-8C0F-5C5D3A8A1A22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4B0C4C5-19AC-4F7B-8C0F-5C5D3A8A1A22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4B0C4C5-19AC-4F7B-8C0F-5C5D3A8A1A22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4B0C4C5-19AC-4F7B-8C0F-5C5D3A8A1A22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,104 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: betstrike-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Str0ng!Passw0rd2026"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: betstrike-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools18:latest
+    container_name: betstrike-db-init
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./:/work
+    entrypoint: ["/bin/bash", "/work/scripts/init-sqlserver.sh"]
+    environment:
+      SQLCMDPASSWORD: "Str0ng!Passw0rd2026"
+
+  betting-api:
+    build:
+      context: .
+      dockerfile: src/BetStrike.Betting.Api/Dockerfile
+    container_name: betstrike-betting-api
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__ApostasDb: Server=sqlserver,1433;Database=Apostas;User Id=sa;Password=Str0ng!Passw0rd2026;TrustServerCertificate=True;Encrypt=False
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: /
+    ports:
+      - "5002:8080"
+
+  results-api:
+    build:
+      context: .
+      dockerfile: src/Federation.Results.Api/Dockerfile
+    container_name: betstrike-results-api
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__ResultsDb: Server=sqlserver,1433;Database=ResultadosFutebol;User Id=sa;Password=Str0ng!Passw0rd2026;TrustServerCertificate=True;Encrypt=False
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: /
+    ports:
+      - "5001:8080"
+
+  middleware-worker:
+    build:
+      context: .
+      dockerfile: src/BetStrike.Middleware.Worker/Dockerfile
+    container_name: betstrike-middleware-worker
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
+    environment:
+      ConnectionStrings__AnalyticsDb: Server=sqlserver,1433;Database=Apostas;User Id=sa;Password=Str0ng!Passw0rd2026;TrustServerCertificate=True;Encrypt=False
+      ConnectionStrings__ApostasDb: Server=sqlserver,1433;Database=Apostas;User Id=sa;Password=Str0ng!Passw0rd2026;TrustServerCertificate=True;Encrypt=False
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: /
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: betstrike-frontend
+    depends_on:
+      betting-api:
+        condition: service_started
+      results-api:
+        condition: service_started
+    ports:
+      - "8080:80"
+
+volumes:
+  sqlserver-data:

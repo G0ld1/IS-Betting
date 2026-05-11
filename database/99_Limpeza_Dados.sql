@@ -22,11 +22,16 @@ DELETE FROM dbo.Resultado;
 DELETE FROM dbo.Aposta;
 DELETE FROM dbo.Jogo;
 DELETE FROM dbo.Utilizador;
+DELETE FROM dbo.Evento_Middleware;
+DELETE FROM dbo.Alerta_Middleware;
+DELETE FROM dbo.Dashboard_Competicao;
+DELETE FROM dbo.Dashboard_Resumo;
 
 DBCC CHECKIDENT ('dbo.Resultado', RESEED, 0);
 DBCC CHECKIDENT ('dbo.Aposta', RESEED, 0);
 DBCC CHECKIDENT ('dbo.Jogo', RESEED, 0);
 DBCC CHECKIDENT ('dbo.Utilizador', RESEED, 0);
+DBCC CHECKIDENT ('dbo.Alerta_Middleware', RESEED, 0);
 GO
 
 PRINT '=== Limpeza Pagamentos ===';

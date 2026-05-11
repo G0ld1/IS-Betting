@@ -196,4 +196,56 @@ public sealed class BettingRepository(IConfiguration configuration) : IBettingRe
             commandType: CommandType.StoredProcedure,
             cancellationToken: ct));
     }
+
+    public async Task<DashboardSnapshot> ObterDashboardAsync(CancellationToken ct)
+    {
+        using var db = Open();
+        using var grid = await db.QueryMultipleAsync(new CommandDefinition(
+            "dbo.sp_Middleware_ConsultarDashboard",
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: ct));
+
+        var resumo = grid.ReadFirstOrDefault<DashboardResumo>() ?? new DashboardResumo();
+        var competicoes = grid.Read<DashboardCompeticao>().ToList();
+        var janelasTemporais = grid.Read<DashboardJanelaTemporal>().ToList();
+        var exposicoesJogos = grid.Read<DashboardExposicaoJogo>().ToList();
+        var tiposAposta = grid.Read<DashboardTipoAposta>().ToList();
+        var alertas = grid.Read<DashboardAlerta>().ToList();
+        var eventosRecentes = grid.Read<DashboardEvento>().ToList();
+
+        return new DashboardSnapshot
+        {
+            Resumo = resumo,
+            Competicoes = competicoes,
+            JanelasTemporais = janelasTemporais,
+            ExposicoesJogos = exposicoesJogos,
+            TiposAposta = tiposAposta,
+            Alertas = alertas,
+            EventosRecentes = eventosRecentes
+        };
+    }
+
+    public async Task<IReadOnlyList<DashboardAlerta>> ListarAlertasAsync(int limite, CancellationToken ct)
+    {
+        using var db = Open();
+        var rows = await db.QueryAsync<DashboardAlerta>(new CommandDefinition(
+            "dbo.sp_Middleware_ConsultarAlertas",
+            new { Limite = limite },
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: ct));
+
+        return rows.ToList();
+    }
+
+    public async Task<IReadOnlyList<DashboardEvento>> ListarEventosAsync(int limite, CancellationToken ct)
+    {
+        using var db = Open();
+        var rows = await db.QueryAsync<DashboardEvento>(new CommandDefinition(
+            "dbo.sp_Middleware_ConsultarEventos",
+            new { Limite = limite },
+            commandType: CommandType.StoredProcedure,
+            cancellationToken: ct));
+
+        return rows.ToList();
+    }
 }

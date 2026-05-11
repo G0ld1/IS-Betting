@@ -15,9 +15,12 @@ $resultsLogOut = Join-Path $logsDir "results-api.out.log"
 $resultsLogErr = Join-Path $logsDir "results-api.err.log"
 $bettingLogOut = Join-Path $logsDir "betting-api.out.log"
 $bettingLogErr = Join-Path $logsDir "betting-api.err.log"
+$workerLogOut = Join-Path $logsDir "middleware-worker.out.log"
+$workerLogErr = Join-Path $logsDir "middleware-worker.err.log"
 
 $resultsProc = $null
 $bettingProc = $null
+$workerProc = $null
 
 function Assert-Tool {
     param([Parameter(Mandatory = $true)][string]$ToolName)
@@ -71,6 +74,7 @@ try {
     Write-Host "[3/5] Arrancar APIs..."
     $resultsProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -WorkingDirectory (Join-Path $root "src\Federation.Results.Api") -RedirectStandardOutput $resultsLogOut -RedirectStandardError $resultsLogErr -PassThru
     $bettingProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -WorkingDirectory (Join-Path $root "src\BetStrike.Betting.Api") -RedirectStandardOutput $bettingLogOut -RedirectStandardError $bettingLogErr -PassThru
+    $workerProc = Start-Process -FilePath "dotnet" -ArgumentList "run" -WorkingDirectory (Join-Path $root "src\BetStrike.Middleware.Worker") -RedirectStandardOutput $workerLogOut -RedirectStandardError $workerLogErr -PassThru
 
     Write-Host "[4/5] Aguardar APIs prontas..."
     Wait-Api -Url "$ResultsApiBase/api/jogos"
@@ -106,6 +110,10 @@ catch {
 
     if ($bettingProc -and -not $bettingProc.HasExited) {
         Stop-Process -Id $bettingProc.Id -Force
+    }
+
+    if ($workerProc -and -not $workerProc.HasExited) {
+        Stop-Process -Id $workerProc.Id -Force
     }
 
     throw

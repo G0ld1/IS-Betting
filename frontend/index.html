@@ -146,6 +146,117 @@
           </div>
         </section>
 
+        <section class="content-card analytics-card" id="sec-analytics">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Analytics</p>
+              <h2>Dashboard em tempo quase real</h2>
+            </div>
+            <p class="section-note" id="dashboardUpdatedAt">A aguardar primeiro snapshot.</p>
+          </div>
+
+          <div class="panel-card panel-card-tight analytics-banner">
+            <div class="panel-row">
+              <div>
+                <span class="label">Estado do stream</span>
+                <strong id="dashboardState" class="status-dot">a aguardar stream</strong>
+              </div>
+              <div class="analytics-inline">
+                <span class="label">Atualização</span>
+                <strong id="dashboardVolume">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="metrics-grid analytics-grid">
+            <article class="metric-tile accent-a">
+              <span>Volume total apostado</span>
+              <strong id="dashboardVolumeTile">—</strong>
+              <small>Agregado do snapshot atual</small>
+            </article>
+            <article class="metric-tile accent-b">
+              <span>Jogos ativos</span>
+              <strong id="dashboardActiveGames">—</strong>
+              <small>Estados Agendado e Em curso</small>
+            </article>
+            <article class="metric-tile accent-c">
+              <span>Apostas pendentes</span>
+              <strong id="dashboardPendingBets">—</strong>
+              <small>Fila atual por resolver</small>
+            </article>
+            <article class="metric-tile accent-d">
+              <span>Taxa de vitória</span>
+              <strong id="dashboardWinRate">—</strong>
+              <small>Rácio de apostas ganhas</small>
+            </article>
+          </div>
+
+          <div class="metrics-grid analytics-grid">
+            <article class="metric-tile accent-a">
+              <span>Apostas por minuto</span>
+              <strong id="dashboardBettingsPerMinute">—</strong>
+              <small>Última hora em fluxo contínuo</small>
+            </article>
+            <article class="metric-tile accent-b">
+              <span>Média móvel 15m</span>
+              <strong id="dashboardMovingAverage">—</strong>
+              <small>Volume médio das últimas janelas</small>
+            </article>
+            <article class="metric-tile accent-c">
+              <span>Máximo horário</span>
+              <strong id="dashboardPeakHour">—</strong>
+              <small>Janela com maior volume nas últimas 24h</small>
+            </article>
+            <article class="metric-tile accent-d">
+              <span>Mínimo horário</span>
+              <strong id="dashboardLowHour">—</strong>
+              <small>Janela com menor volume nas últimas 24h</small>
+            </article>
+          </div>
+
+          <div class="split-columns analytics-columns">
+            <div>
+              <div class="subheading">
+                <h3>Competições em foco</h3>
+                <span>Top 5 por volume</span>
+              </div>
+              <div id="dashboardCompetitions" class="feed-list"></div>
+            </div>
+
+            <div>
+              <div class="subheading">
+                <h3>Alertas</h3>
+                <span>Últimos eventos anómalos</span>
+              </div>
+              <div id="dashboardAlerts" class="feed-list"></div>
+
+              <div class="subheading analytics-subheading">
+                <h3>Eventos recentes</h3>
+                <span>Stream do broker</span>
+              </div>
+              <div id="dashboardEvents" class="feed-list"></div>
+
+              <div class="subheading analytics-subheading">
+                <h3>Janelas temporais</h3>
+                <span>Últimas 24h</span>
+              </div>
+              <div id="dashboardWindows" class="feed-list"></div>
+
+              <div class="subheading analytics-subheading">
+                <h3>Exposição por jogo</h3>
+                <span>Risco agregado</span>
+              </div>
+              <div id="dashboardExposures" class="feed-list"></div>
+
+              <div class="subheading analytics-subheading">
+                <h3>Desempenho por tipo</h3>
+                <span>Casa, Empate e Fora</span>
+              </div>
+              <div id="dashboardBetTypes" class="feed-list"></div>
+            </div>
+          </div>
+        </section>
+
         <section class="content-card table-card wide-card" id="sec-jogos">
           <div class="section-heading">
             <div>

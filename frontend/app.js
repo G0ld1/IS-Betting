@@ -30,6 +30,7 @@ const state = {
   users: [],
   statsGame: null,
   statsCompetition: null,
+  dashboard: null,
   lastCreatedUserId: null,
   settings: loadSettings(),
   filter: "all",
@@ -178,6 +179,91 @@ function normalizeGameStats(stats) {
     ApostasFora: pickValue(stats, "ApostasFora", "apostasFora"),
     Pendentes: pickValue(stats, "Pendentes", "pendentes"),
     MargemPlataforma: pickValue(stats, "MargemPlataforma", "margemPlataforma"),
+  };
+}
+
+function normalizeDashboardSnapshot(snapshot) {
+  return {
+    Resumo: snapshot?.Resumo
+      ? {
+          AtualizadoUtc: pickValue(snapshot.Resumo, "AtualizadoUtc", "atualizadoUtc"),
+          JogosAtivos: pickValue(snapshot.Resumo, "JogosAtivos", "jogosAtivos"),
+          ApostasPendentes: pickValue(snapshot.Resumo, "ApostasPendentes", "apostasPendentes"),
+          ApostasGanhas: pickValue(snapshot.Resumo, "ApostasGanhas", "apostasGanhas"),
+          VolumeTotalApostado: pickValue(snapshot.Resumo, "VolumeTotalApostado", "volumeTotalApostado"),
+          MargemPlataforma: pickValue(snapshot.Resumo, "MargemPlataforma", "margemPlataforma"),
+          UtilizadoresAtivos: pickValue(snapshot.Resumo, "UtilizadoresAtivos", "utilizadoresAtivos"),
+          ApostasPorMinuto: pickValue(snapshot.Resumo, "ApostasPorMinuto", "apostasPorMinuto"),
+          MediaMovel15MinVolume: pickValue(snapshot.Resumo, "MediaMovel15MinVolume", "mediaMovel15MinVolume"),
+          MaxVolumeHora: pickValue(snapshot.Resumo, "MaxVolumeHora", "maxVolumeHora"),
+          MinVolumeHora: pickValue(snapshot.Resumo, "MinVolumeHora", "minVolumeHora"),
+        }
+      : null,
+    Competicoes: Array.isArray(snapshot?.Competicoes)
+      ? snapshot.Competicoes.map((item) => ({
+          Competicao: pickValue(item, "Competicao", "competicao"),
+          MediaGolosPorJogo: pickValue(item, "MediaGolosPorJogo", "mediaGolosPorJogo"),
+          VolumeTotalApostado: pickValue(item, "VolumeTotalApostado", "volumeTotalApostado"),
+          TaxaResultado1: pickValue(item, "TaxaResultado1", "taxaResultado1"),
+          TaxaResultadoX: pickValue(item, "TaxaResultadoX", "taxaResultadoX"),
+          TaxaResultado2: pickValue(item, "TaxaResultado2", "taxaResultado2"),
+          AtualizadoUtc: pickValue(item, "AtualizadoUtc", "atualizadoUtc"),
+        }))
+      : [],
+    JanelasTemporais: Array.isArray(snapshot?.JanelasTemporais)
+      ? snapshot.JanelasTemporais.map((item) => ({
+          JanelaInicioUtc: pickValue(item, "JanelaInicioUtc", "janelaInicioUtc"),
+          Apostas: pickValue(item, "Apostas", "apostas"),
+          VolumeTotal: pickValue(item, "VolumeTotal", "volumeTotal"),
+          MediaAposta: pickValue(item, "MediaAposta", "mediaAposta"),
+          MaxAposta: pickValue(item, "MaxAposta", "maxAposta"),
+          MinAposta: pickValue(item, "MinAposta", "minAposta"),
+        }))
+      : [],
+    ExposicoesJogos: Array.isArray(snapshot?.ExposicoesJogos)
+      ? snapshot.ExposicoesJogos.map((item) => ({
+          JogoId: pickValue(item, "JogoId", "jogoId"),
+          CodigoJogo: pickValue(item, "CodigoJogo", "codigoJogo"),
+          Competicao: pickValue(item, "Competicao", "competicao"),
+          ApostasPendentes: pickValue(item, "ApostasPendentes", "apostasPendentes"),
+          VolumeTotal: pickValue(item, "VolumeTotal", "volumeTotal"),
+          ExposicaoLiquida: pickValue(item, "ExposicaoLiquida", "exposicaoLiquida"),
+          AtualizadoUtc: pickValue(item, "AtualizadoUtc", "atualizadoUtc"),
+        }))
+      : [],
+    TiposAposta: Array.isArray(snapshot?.TiposAposta)
+      ? snapshot.TiposAposta.map((item) => ({
+          TipoAposta: pickValue(item, "TipoAposta", "tipoAposta"),
+          TotalApostas: pickValue(item, "TotalApostas", "totalApostas"),
+          ApostasGanhas: pickValue(item, "ApostasGanhas", "apostasGanhas"),
+          ApostasPerdidas: pickValue(item, "ApostasPerdidas", "apostasPerdidas"),
+          TaxaVitoria: pickValue(item, "TaxaVitoria", "taxaVitoria"),
+          VolumeTotal: pickValue(item, "VolumeTotal", "volumeTotal"),
+          AtualizadoUtc: pickValue(item, "AtualizadoUtc", "atualizadoUtc"),
+        }))
+      : [],
+    Alertas: Array.isArray(snapshot?.Alertas)
+      ? snapshot.Alertas.map((item) => ({
+          Id: pickValue(item, "Id", "id"),
+          Severidade: pickValue(item, "Severidade", "severidade"),
+          Mensagem: pickValue(item, "Mensagem", "mensagem"),
+          Competicao: pickValue(item, "Competicao", "competicao"),
+          SourceEventId: pickValue(item, "SourceEventId", "sourceEventId"),
+          CriadoEmUtc: pickValue(item, "CriadoEmUtc", "criadoEmUtc"),
+        }))
+      : [],
+    EventosRecentes: Array.isArray(snapshot?.EventosRecentes)
+      ? snapshot.EventosRecentes.map((item) => ({
+          EventSequence: pickValue(item, "EventSequence", "eventSequence"),
+          EventId: pickValue(item, "EventId", "eventId"),
+          EventType: pickValue(item, "EventType", "eventType"),
+          SourceSystem: pickValue(item, "SourceSystem", "sourceSystem"),
+          AggregateType: pickValue(item, "AggregateType", "aggregateType"),
+          AggregateKey: pickValue(item, "AggregateKey", "aggregateKey"),
+          PayloadJson: pickValue(item, "PayloadJson", "payloadJson"),
+          CriadoEmUtc: pickValue(item, "CriadoEmUtc", "criadoEmUtc"),
+        }))
+      : [],
   };
 }
 
@@ -358,16 +444,18 @@ async function loadData() {
     requestJson(resultsBase, "/api/jogos").catch((error) => ({ __error: error, source: "resultsGames" })),
     requestJson(bettingBase, "/api/apostas").catch((error) => ({ __error: error, source: "bets" })),
     requestJson(bettingBase, "/api/utilizadores").catch((error) => ({ __error: error, source: "users" })),
+    requestJson(bettingBase, "/api/analytics/dashboard").catch((error) => ({ __error: error, source: "dashboard" })),
   ];
 
-  const [bettingGames, resultsGames, bets, users] = await Promise.all(tasks);
+  const [bettingGames, resultsGames, bets, users, dashboard] = await Promise.all(tasks);
 
   state.bettingGames = Array.isArray(bettingGames) ? bettingGames.map(normalizeBettingGame) : [];
   state.resultsGames = Array.isArray(resultsGames) ? resultsGames.map(normalizeFederationGame) : [];
   state.bets = Array.isArray(bets) ? bets.map(normalizeBet) : [];
   state.users = Array.isArray(users) ? users.map(normalizeUser) : [];
+  state.dashboard = dashboard && !dashboard.__error ? normalizeDashboardSnapshot(dashboard) : null;
 
-  const errors = [bettingGames, resultsGames, bets, users].filter((item) => item && item.__error);
+  const errors = [bettingGames, resultsGames, bets, users, dashboard].filter((item) => item && item.__error);
   if (errors.length > 0) {
     setConnectionState("partial");
     appendLog("warning", "Algumas consultas falharam", errors[0].__error?.message || "Erro inesperado.");
@@ -407,6 +495,7 @@ function setSectionMessage(id, message) {
 
 function renderAll() {
   renderSummary();
+  renderDashboardPanel();
   renderGames();
   renderBets();
   renderUsers();
@@ -614,6 +703,140 @@ function renderStatsPanel() {
     elements.statsCompetitionCode.textContent = "—";
     elements.competitionStatsOutput.textContent = "{}";
   }
+}
+
+function renderDashboardPanel() {
+  if (!state.dashboard || !state.dashboard.Resumo) {
+    elements.dashboardState.textContent = "a aguardar stream";
+    elements.dashboardState.className = "status-dot";
+    elements.dashboardUpdatedAt.textContent = "sem dados de analytics";
+    elements.dashboardVolume.textContent = "—";
+    elements.dashboardVolumeTile.textContent = "—";
+    elements.dashboardActiveGames.textContent = "—";
+    elements.dashboardPendingBets.textContent = "—";
+    elements.dashboardWinRate.textContent = "—";
+    elements.dashboardCompetitions.innerHTML = '<div class="feed-item"><strong>Sem snapshot</strong><small>O worker ainda não publicou métricas.</small></div>';
+    elements.dashboardWindows.innerHTML = '<div class="feed-item"><strong>Sem janelas</strong><small>O stream ainda não gerou janelas temporais.</small></div>';
+    elements.dashboardExposures.innerHTML = '<div class="feed-item"><strong>Sem exposição</strong><small>Os jogos aparecem aqui com o respetivo risco agregado.</small></div>';
+    elements.dashboardBetTypes.innerHTML = '<div class="feed-item"><strong>Sem tipo de aposta</strong><small>Os rácios por tipo aparecem após o primeiro snapshot.</small></div>';
+    elements.dashboardAlerts.innerHTML = '<div class="feed-item"><strong>Sem alertas</strong><small>Os alertas aparecerão aqui quando o worker detetar uma anomalia.</small></div>';
+    elements.dashboardEvents.innerHTML = '<div class="feed-item"><strong>Sem eventos</strong><small>Os últimos eventos do stream surgirão aqui.</small></div>';
+    return;
+  }
+
+  const resumo = state.dashboard.Resumo;
+  elements.dashboardState.textContent = "online";
+  elements.dashboardState.className = "status-dot ok";
+  elements.dashboardUpdatedAt.textContent = `Atualizado em ${formatDate(resumo.AtualizadoUtc)}`;
+  const volumeText = formatCurrency(resumo.VolumeTotalApostado);
+  elements.dashboardVolume.textContent = volumeText;
+  elements.dashboardVolumeTile.textContent = volumeText;
+  elements.dashboardActiveGames.textContent = String(resumo.JogosAtivos ?? 0);
+  elements.dashboardPendingBets.textContent = String(resumo.ApostasPendentes ?? 0);
+  if (elements.dashboardBettingsPerMinute) {
+    elements.dashboardBettingsPerMinute.textContent = formatNumber(resumo.ApostasPorMinuto ?? 0);
+  }
+  if (elements.dashboardMovingAverage) {
+    elements.dashboardMovingAverage.textContent = formatCurrency(resumo.MediaMovel15MinVolume ?? 0);
+  }
+  if (elements.dashboardPeakHour) {
+    elements.dashboardPeakHour.textContent = formatCurrency(resumo.MaxVolumeHora ?? 0);
+  }
+  if (elements.dashboardLowHour) {
+    elements.dashboardLowHour.textContent = formatCurrency(resumo.MinVolumeHora ?? 0);
+  }
+  const winRate = Number(resumo.ApostasGanhas || 0) + Number(resumo.ApostasPendentes || 0) > 0
+    ? ((Number(resumo.ApostasGanhas || 0) / (Number(resumo.ApostasGanhas || 0) + Number(resumo.ApostasPendentes || 0))) * 100).toFixed(1)
+    : "0.0";
+  elements.dashboardWinRate.textContent = `${winRate}%`;
+
+  elements.dashboardCompetitions.innerHTML = state.dashboard.Competicoes.length
+    ? state.dashboard.Competicoes
+        .slice(0, 5)
+        .map(
+          (competition) => `
+            <div class="feed-item">
+              <strong>${escapeHtml(competition.Competicao || "—")}</strong>
+              <small>${formatCurrency(competition.VolumeTotalApostado)} • média ${formatNumber(competition.MediaGolosPorJogo)} golos/jogo</small>
+              <small>1: ${formatNumber((Number(competition.TaxaResultado1 || 0) * 100))}% | X: ${formatNumber((Number(competition.TaxaResultadoX || 0) * 100))}% | 2: ${formatNumber((Number(competition.TaxaResultado2 || 0) * 100))}%</small>
+            </div>
+          `
+        )
+        .join("")
+    : '<div class="feed-item"><strong>Sem competições</strong><small>Não há métricas agregadas disponíveis.</small></div>';
+
+  elements.dashboardWindows.innerHTML = state.dashboard.JanelasTemporais.length
+    ? state.dashboard.JanelasTemporais
+        .slice(0, 8)
+        .map(
+          (windowSlice) => `
+            <div class="feed-item">
+              <strong>${formatDate(windowSlice.JanelaInicioUtc)}</strong>
+              <small>${Number(windowSlice.Apostas || 0)} apostas • ${formatCurrency(windowSlice.VolumeTotal)} • média ${formatCurrency(windowSlice.MediaAposta)}</small>
+              <small>máx. ${formatCurrency(windowSlice.MaxAposta)} | mín. ${formatCurrency(windowSlice.MinAposta)}</small>
+            </div>
+          `
+        )
+        .join("")
+    : '<div class="feed-item"><strong>Sem janelas</strong><small>Não há dados temporais para mostrar.</small></div>';
+
+  elements.dashboardExposures.innerHTML = state.dashboard.ExposicoesJogos.length
+    ? state.dashboard.ExposicoesJogos
+        .slice(0, 10)
+        .map(
+          (item) => `
+            <div class="feed-item">
+              <strong>${escapeHtml(item.CodigoJogo || `Jogo #${item.JogoId}`)}${item.Competicao ? ` • ${escapeHtml(item.Competicao)}` : ""}</strong>
+              <small>${formatCurrency(item.VolumeTotal)} de volume • exposição líquida ${formatCurrency(item.ExposicaoLiquida)}</small>
+              <small>${Number(item.ApostasPendentes || 0)} apostas pendentes</small>
+            </div>
+          `
+        )
+        .join("")
+    : '<div class="feed-item"><strong>Sem exposição</strong><small>Os jogos aparecerão aqui assim que houver apostas.</small></div>';
+
+  elements.dashboardBetTypes.innerHTML = state.dashboard.TiposAposta.length
+    ? state.dashboard.TiposAposta
+        .map(
+          (item) => `
+            <div class="feed-item">
+              <strong>${escapeHtml(betTypeLabels[item.TipoAposta] || item.TipoAposta)}</strong>
+              <small>${Number(item.TotalApostas || 0)} apostas • vitória ${(Number(item.TaxaVitoria || 0) * 100).toFixed(1)}%</small>
+              <small>${Number(item.ApostasGanhas || 0)} ganhas | ${Number(item.ApostasPerdidas || 0)} perdidas • ${formatCurrency(item.VolumeTotal)}</small>
+            </div>
+          `
+        )
+        .join("")
+    : '<div class="feed-item"><strong>Sem tipo de aposta</strong><small>O worker ainda não agregou desempenho por tipo.</small></div>';
+
+  elements.dashboardAlerts.innerHTML = state.dashboard.Alertas.length
+    ? state.dashboard.Alertas
+        .slice(0, 6)
+        .map(
+          (alert) => `
+            <div class="feed-item alert-${escapeHtml(String(alert.Severidade || "Média")).toLowerCase()}">
+              <strong>${escapeHtml(alert.Severidade || "Média")}${alert.Competicao ? ` • ${escapeHtml(alert.Competicao)}` : ""}</strong>
+              <small>${escapeHtml(alert.Mensagem || "Sem mensagem")}</small>
+            </div>
+          `
+        )
+        .join("")
+    : '<div class="feed-item"><strong>Sem alertas</strong><small>Sem anomalias registadas no intervalo recente.</small></div>';
+
+  elements.dashboardEvents.innerHTML = state.dashboard.EventosRecentes.length
+    ? state.dashboard.EventosRecentes
+        .slice(0, 8)
+        .map(
+          (event) => `
+            <div class="feed-item">
+              <strong>${escapeHtml(event.EventType || "Evento")}</strong>
+              <small>#${Number(event.EventSequence || 0)} • ${escapeHtml(event.SourceSystem || "—")} • ${escapeHtml(event.AggregateType || "—")}:${escapeHtml(event.AggregateKey || "—")}</small>
+              <small>${formatDate(event.CriadoEmUtc)}</small>
+            </div>
+          `
+        )
+        .join("")
+    : '<div class="feed-item"><strong>Sem eventos</strong><small>O stream ainda não foi preenchido.</small></div>';
 }
 
 function appendLog(kind, title, detail) {
@@ -940,6 +1163,23 @@ function hydrateElements() {
     "metricWonBets",
     "metricCompetition",
     "metricCompetitionDetail",
+    "dashboardState",
+    "dashboardUpdatedAt",
+    "dashboardVolume",
+    "dashboardVolumeTile",
+    "dashboardActiveGames",
+    "dashboardPendingBets",
+    "dashboardWinRate",
+    "dashboardCompetitions",
+    "dashboardWindows",
+    "dashboardExposures",
+    "dashboardBetTypes",
+    "dashboardAlerts",
+    "dashboardEvents",
+    "dashboardBettingsPerMinute",
+    "dashboardMovingAverage",
+    "dashboardPeakHour",
+    "dashboardLowHour",
     "bettingGamesCount",
     "resultsGamesCount",
     "bettingGamesBody",
@@ -979,6 +1219,23 @@ function hydrateElements() {
   elements.metricWonBets = document.getElementById("metricWonBets");
   elements.metricCompetition = document.getElementById("metricCompetition");
   elements.metricCompetitionDetail = document.getElementById("metricCompetitionDetail");
+  elements.dashboardState = document.getElementById("dashboardState");
+  elements.dashboardUpdatedAt = document.getElementById("dashboardUpdatedAt");
+  elements.dashboardVolume = document.getElementById("dashboardVolume");
+  elements.dashboardVolumeTile = document.getElementById("dashboardVolumeTile");
+  elements.dashboardActiveGames = document.getElementById("dashboardActiveGames");
+  elements.dashboardPendingBets = document.getElementById("dashboardPendingBets");
+  elements.dashboardWinRate = document.getElementById("dashboardWinRate");
+  elements.dashboardCompetitions = document.getElementById("dashboardCompetitions");
+  elements.dashboardWindows = document.getElementById("dashboardWindows");
+  elements.dashboardExposures = document.getElementById("dashboardExposures");
+  elements.dashboardBetTypes = document.getElementById("dashboardBetTypes");
+  elements.dashboardAlerts = document.getElementById("dashboardAlerts");
+  elements.dashboardEvents = document.getElementById("dashboardEvents");
+  elements.dashboardBettingsPerMinute = document.getElementById("dashboardBettingsPerMinute");
+  elements.dashboardMovingAverage = document.getElementById("dashboardMovingAverage");
+  elements.dashboardPeakHour = document.getElementById("dashboardPeakHour");
+  elements.dashboardLowHour = document.getElementById("dashboardLowHour");
   elements.bettingGamesCount = document.getElementById("bettingGamesCount");
   elements.resultsGamesCount = document.getElementById("resultsGamesCount");
   elements.bettingGamesBody = document.getElementById("bettingGamesBody");
@@ -1019,6 +1276,7 @@ async function init() {
   updateBaseLabels();
   bindEvents();
   await loadData();
+  setInterval(loadData, 5000);
 }
 
 window.addEventListener("DOMContentLoaded", init);

@@ -8,11 +8,29 @@ Para criação de bases de dados e arranque das APIs, use:
 powershell -ExecutionPolicy Bypass -File .\scripts\preparar_entrega_professor.ps1
 ```
 
+Se preferires a infraestrutura containerizada completa, usa:
+
+```powershell
+docker compose up --build
+```
+
+Isto sobe automaticamente SQL Server, RabbitMQ, as duas APIs, o worker e o frontend.
+
 O script faz automaticamente:
 - criação/atualização de tabelas, SPs e trigger;
 - limpeza de dados antigos;
 - arranque das APIs (5001 e 5002);
+- arranque do worker de middleware para consumo do stream/fila;
 - injeção de dados de demo (jogos, utilizadores, apostas e resultados).
+
+Antes de correr a Parte 2, garante também que existe um broker RabbitMQ acessível em `localhost:5672`.
+Um arranque local rápido com Docker é:
+
+```powershell
+docker run -d --name betstrike-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+
+No modelo atual, o middleware deixa de depender só de uma recalculação periódica: os eventos são arquivados em `Apostas.dbo.Evento_Middleware`, o replay usa `Stream_ReplayCheckpoint` e os alertas são gerados por evento através de `AlertRaisedEvent`.
 
 No fim, basta servir o frontend:
 
@@ -51,12 +69,14 @@ Se estiveres a usar VS Code, executa os scripts **um a um**:
 
 - Resultados API: [src/Federation.Results.Api/appsettings.json](src/Federation.Results.Api/appsettings.json)
 - Apostas API: [src/BetStrike.Betting.Api/appsettings.json](src/BetStrike.Betting.Api/appsettings.json)
+- Worker de middleware: [src/BetStrike.Middleware.Worker/appsettings.json](src/BetStrike.Middleware.Worker/appsettings.json)
 
 ## 3) Arrancar APIs
 
 Com as `launchSettings` já fixadas:
 - Resultados API: `http://localhost:5001`
 - Apostas API: `http://localhost:5002`
+- Worker de middleware: consola em background, sem endpoint HTTP
 
 ## 4) Teste fim-a-fim
 
@@ -67,6 +87,7 @@ Usar [tests/e2e_betstrike.http](tests/e2e_betstrike.http) por esta sequência:
 4. Finalizar jogo + resultado.
 5. Verificar aposta resolvida (`Estado=2` ganha ou `Estado=3` perdida).
 6. Verificar crédito em `Pagamentos.dbo.Transacao` (`PG`) e saldo atualizado em `Pagamentos.dbo.Saldo_Utilizador`.
+7. Abrir `http://localhost:5002/api/analytics/dashboard` para ver o snapshot live da Parte 2.
 
 
 ### Demo rápida 

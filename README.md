@@ -11,6 +11,24 @@
 - `database/Pagamentos` — esquema e stored procedures da BD `Pagamentos`
 - `database/Integration/Triggers` — trigger de integração entre apostas e pagamentos
 
+## Arranque completo com Docker
+
+Para subir a infraestrutura toda com um único comando:
+
+```powershell
+docker compose up --build
+```
+
+O compose inclui:
+- SQL Server com bootstrap automático dos scripts em `database/`;
+- RabbitMQ com management UI;
+- `BetStrike.Betting.Api`;
+- `Federation.Results.Api`;
+- `BetStrike.Middleware.Worker`;
+- `frontend/` servido em `http://localhost:8080`.
+
+O replay é feito a partir do stream persistido em `Apostas.dbo.Evento_Middleware`. O worker grava os eventos, reprocessa historicamente com checkpoint e republica alertas idempotentes via `AlertRaisedEvent`, para que o comportamento se aproxime de uma stream com replay e não apenas de uma fila transitória.
+
 ## Princípios aplicados
 
 - Toda a camada de dados usa **Stored Procedures** .
