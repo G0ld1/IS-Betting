@@ -99,6 +99,54 @@ function formatNumber(value) {
   return new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 }).format(Number(value || 0));
 }
 
+function normalizeDateInput(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    return text;
+  }
+
+  const parsed = new Date(text);
+  if (Number.isNaN(parsed.getTime())) {
+    return text;
+  }
+
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function normalizeTimeInput(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const trimmed = text.replace(/\s+/g, "");
+  const isoMatch = trimmed.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+  if (isoMatch) {
+    const hours = isoMatch[1];
+    const minutes = isoMatch[2];
+    const seconds = isoMatch[3] || "00";
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  const amPmMatch = trimmed.match(/^(\d{1,2}):(\d{2})(AM|PM)$/i);
+  if (amPmMatch) {
+    let hours = Number(amPmMatch[1]);
+    const minutes = amPmMatch[2];
+    const suffix = amPmMatch[3].toUpperCase();
+
+    if (suffix === "PM" && hours < 12) hours += 12;
+    if (suffix === "AM" && hours === 12) hours = 0;
+
+    return `${String(hours).padStart(2, "0")}:${minutes}:00`;
+  }
+
+  return text;
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -903,8 +951,8 @@ async function handleCreateBettingGame(event) {
   try {
     const payload = {
       codigoJogo: String(formData.get("codigoJogo") || "").trim(),
-      dataJogo: String(formData.get("dataJogo") || "").trim(),
-      horaInicio: String(formData.get("horaInicio") || "").trim(),
+      dataJogo: normalizeDateInput(formData.get("dataJogo")),
+      horaInicio: normalizeTimeInput(formData.get("horaInicio")),
       equipaCasa: String(formData.get("equipaCasa") || "").trim(),
       equipaFora: String(formData.get("equipaFora") || "").trim(),
       competicao: String(formData.get("competicao") || "").trim(),
@@ -934,8 +982,8 @@ async function handleCreateFederationGame(event) {
   try {
     const payload = {
       codigoJogo: String(formData.get("codigoJogo") || "").trim(),
-      dataJogo: String(formData.get("dataJogo") || "").trim(),
-      horaInicio: String(formData.get("horaInicio") || "").trim(),
+      dataJogo: normalizeDateInput(formData.get("dataJogo")),
+      horaInicio: normalizeTimeInput(formData.get("horaInicio")),
       equipaCasa: String(formData.get("equipaCasa") || "").trim(),
       equipaFora: String(formData.get("equipaFora") || "").trim(),
       estado: Number(formData.get("estado") || 1),

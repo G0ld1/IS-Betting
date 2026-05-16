@@ -19,7 +19,7 @@ services:
       - "15672:15672"
 
   db-init:
-    image: mcr.microsoft.com/mssql-tools18:latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: betstrike-db-init
     depends_on:
       - sqlserver
@@ -27,6 +27,7 @@ services:
       - ./:/work
     entrypoint: ["/bin/bash", "/work/scripts/init-sqlserver.sh"]
     environment:
+      ACCEPT_EULA: "Y"
       SQLCMDPASSWORD: "Str0ng!Passw0rd2026"
 
   betting-api:

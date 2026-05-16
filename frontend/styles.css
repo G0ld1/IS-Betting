@@ -366,7 +366,8 @@ h1 {
 .stats-card,
 .log-card,
 .settings-card,
-.metrics-card {
+.metrics-card,
+.analytics-card {
   grid-column: 1 / -1;
 }
 

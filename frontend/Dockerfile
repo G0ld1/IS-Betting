@@ -1,2 +1,2 @@
 FROM nginx:1.27-alpine
-COPY . /usr/share/nginx/html
+COPY frontend/ /usr/share/nginx/html/

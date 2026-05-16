@@ -132,11 +132,18 @@ public sealed class PlatformEventProcessor(
             _ => false
         };
 
-        var refresh = highPriority
-            ? new HighPriorityDashboardRefreshRequestedEvent(Guid.NewGuid(), "middleware.worker", "dashboard", "global", DateTime.UtcNow, "event stream update", message.EventId)
-            : new LowPriorityDashboardRefreshRequestedEvent(Guid.NewGuid(), "middleware.worker", "dashboard", "global", DateTime.UtcNow, "event stream update", message.EventId);
-
-        await publishEndpoint.Publish(refresh, ct);
+        if (highPriority)
+        {
+            await publishEndpoint.Publish(
+                new HighPriorityDashboardRefreshRequestedEvent(Guid.NewGuid(), "middleware.worker", "dashboard", "global", DateTime.UtcNow, "event stream update", message.EventId),
+                ct);
+        }
+        else
+        {
+            await publishEndpoint.Publish(
+                new LowPriorityDashboardRefreshRequestedEvent(Guid.NewGuid(), "middleware.worker", "dashboard", "global", DateTime.UtcNow, "event stream update", message.EventId),
+                ct);
+        }
     }
 
     private async Task<List<AlertRaisedEvent>> BuildAlertsAsync(IPlatformEvent message, CancellationToken ct)
