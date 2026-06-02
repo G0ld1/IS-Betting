@@ -1,10 +1,15 @@
 using BetStrike.Betting.Api.Domain;
+using BetStrike.Betting.Api.Infrastructure;
 using BetStrike.Middleware.Contracts;
 using MassTransit;
 
 namespace BetStrike.Betting.Api.Application;
 
-public sealed class BettingService(IBettingRepository repository, IPublishEndpoint publishEndpoint, ILogger<BettingService> logger) : IBettingService
+public sealed class BettingService(
+    IBettingRepository repository,
+    IPublishEndpoint publishEndpoint,
+    IKafkaEventPublisher kafkaEventPublisher,
+    ILogger<BettingService> logger) : IBettingService
 {
     public async Task<int> InserirJogoAsync(InserirJogoRequest request, CancellationToken ct)
     {
@@ -121,8 +126,11 @@ public sealed class BettingService(IBettingRepository repository, IPublishEndpoi
     public Task<IReadOnlyList<DashboardEvento>> ListarEventosAsync(int limite, CancellationToken ct)
         => repository.ListarEventosAsync(limite, ct);
 
+    public Task<StreamStatusSnapshot> ObterStreamStatusAsync(CancellationToken ct)
+        => repository.ObterStreamStatusAsync(ct);
+
     private async Task PublishSafelyAsync<T>(T message, CancellationToken ct)
-        where T : class
+        where T : class, IPlatformEvent
     {
         try
         {
@@ -131,6 +139,15 @@ public sealed class BettingService(IBettingRepository repository, IPublishEndpoi
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Falha ao publicar evento {EventType} no broker.", typeof(T).Name);
+        }
+
+        try
+        {
+            await kafkaEventPublisher.PublishAsync(message, ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Falha ao publicar evento {EventType} no Kafka.", typeof(T).Name);
         }
     }
 }

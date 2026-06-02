@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260516-1" />
+    <link rel="stylesheet" href="styles.css?v=20260602-2" />
   </head>
   <body>
     <div class="page-shell">
@@ -254,6 +254,78 @@
               </div>
               <div id="dashboardBetTypes" class="feed-list"></div>
             </div>
+          </div>
+        </section>
+
+        <section class="content-card middleware-card" id="sec-middleware">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Parte 2</p>
+              <h2>Middleware, streaming e processamento assincrono</h2>
+            </div>
+            <p class="section-note">Painel para explicar Kafka, RabbitMQ, replay, alertas e analytics.</p>
+          </div>
+
+          <div class="topology-grid">
+            <article class="topology-node producer">
+              <span class="label">Produtores</span>
+              <strong>Betting API + Results API</strong>
+              <small>Persistem operacoes e publicam eventos sem conhecer consumidores.</small>
+            </article>
+            <article class="topology-node stream">
+              <span class="label">Streaming</span>
+              <strong>Apache Kafka</strong>
+              <small>Topics `bets-events`, `game-events` e `analytics-events` para near real time.</small>
+            </article>
+            <article class="topology-node queue">
+              <span class="label">Filas</span>
+              <strong>RabbitMQ + MassTransit</strong>
+              <small>Retries, redelivery, prioridades e dead-letter queues.</small>
+            </article>
+            <article class="topology-node consumer">
+              <span class="label">Consumidores</span>
+              <strong>Workers dedicados</strong>
+              <small>Atualizam dashboard, alertas, stream persistido e checkpoint.</small>
+            </article>
+          </div>
+
+          <div class="middleware-actions">
+            <a class="button secondary" href="http://localhost:8081" target="_blank" rel="noreferrer">Abrir Kafka UI</a>
+            <a class="button secondary" href="http://localhost:15672" target="_blank" rel="noreferrer">Abrir RabbitMQ</a>
+            <a class="button secondary" href="http://localhost:5002/api/analytics/stream" target="_blank" rel="noreferrer">Estado do stream</a>
+            <a class="button secondary" href="http://localhost:5002/api/analytics/events?limite=20" target="_blank" rel="noreferrer">Eventos</a>
+            <a class="button secondary" href="http://localhost:5002/api/analytics/alerts?limite=20" target="_blank" rel="noreferrer">Alertas</a>
+          </div>
+
+          <div class="metrics-grid middleware-grid">
+            <article class="metric-tile accent-a">
+              <span>Broker ativo</span>
+              <strong id="middlewareBroker">--</strong>
+              <small id="middlewareBrokerDetail">RabbitMQ para filas e Kafka para streaming.</small>
+            </article>
+            <article class="metric-tile accent-b">
+              <span>Ultima sequencia</span>
+              <strong id="middlewareLastSequence">--</strong>
+              <small>Evento mais recente arquivado em SQL.</small>
+            </article>
+            <article class="metric-tile accent-c">
+              <span>Checkpoint replay</span>
+              <strong id="middlewareReplayCheckpoint">--</strong>
+              <small>Ultimo evento reprocessado pelo worker RabbitMQ.</small>
+            </article>
+            <article class="metric-tile accent-d">
+              <span>Pendentes replay</span>
+              <strong id="middlewarePendingEvents">--</strong>
+              <small>Diferenca entre stream persistido e checkpoint.</small>
+            </article>
+          </div>
+
+          <div class="subheading analytics-subheading">
+            <h3>Evidencia viva</h3>
+            <span>Dados vindos de /api/analytics/stream e /api/analytics/dashboard</span>
+          </div>
+          <div id="middlewareEvidence" class="feed-list evidence-list">
+            <div class="feed-item"><strong>A aguardar dados</strong><small>O painel atualiza automaticamente a cada 5 segundos.</small></div>
           </div>
         </section>
 
@@ -618,6 +690,6 @@
       </main>
     </div>
 
-    <script src="app.js?v=20260516-1"></script>
+    <script src="app.js?v=20260603-1"></script>
   </body>
 </html>

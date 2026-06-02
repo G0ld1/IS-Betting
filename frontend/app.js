@@ -31,6 +31,7 @@ const state = {
   statsGame: null,
   statsCompetition: null,
   dashboard: null,
+  streamStatus: null,
   lastCreatedUserId: null,
   settings: loadSettings(),
   filter: "all",
@@ -231,24 +232,32 @@ function normalizeGameStats(stats) {
 }
 
 function normalizeDashboardSnapshot(snapshot) {
+  const resumo = pickValue(snapshot, "Resumo", "resumo");
+  const competicoes = pickValue(snapshot, "Competicoes", "competicoes");
+  const janelasTemporais = pickValue(snapshot, "JanelasTemporais", "janelasTemporais");
+  const exposicoesJogos = pickValue(snapshot, "ExposicoesJogos", "exposicoesJogos");
+  const tiposAposta = pickValue(snapshot, "TiposAposta", "tiposAposta");
+  const alertas = pickValue(snapshot, "Alertas", "alertas");
+  const eventosRecentes = pickValue(snapshot, "EventosRecentes", "eventosRecentes");
+
   return {
-    Resumo: snapshot?.Resumo
+    Resumo: resumo
       ? {
-          AtualizadoUtc: pickValue(snapshot.Resumo, "AtualizadoUtc", "atualizadoUtc"),
-          JogosAtivos: pickValue(snapshot.Resumo, "JogosAtivos", "jogosAtivos"),
-          ApostasPendentes: pickValue(snapshot.Resumo, "ApostasPendentes", "apostasPendentes"),
-          ApostasGanhas: pickValue(snapshot.Resumo, "ApostasGanhas", "apostasGanhas"),
-          VolumeTotalApostado: pickValue(snapshot.Resumo, "VolumeTotalApostado", "volumeTotalApostado"),
-          MargemPlataforma: pickValue(snapshot.Resumo, "MargemPlataforma", "margemPlataforma"),
-          UtilizadoresAtivos: pickValue(snapshot.Resumo, "UtilizadoresAtivos", "utilizadoresAtivos"),
-          ApostasPorMinuto: pickValue(snapshot.Resumo, "ApostasPorMinuto", "apostasPorMinuto"),
-          MediaMovel15MinVolume: pickValue(snapshot.Resumo, "MediaMovel15MinVolume", "mediaMovel15MinVolume"),
-          MaxVolumeHora: pickValue(snapshot.Resumo, "MaxVolumeHora", "maxVolumeHora"),
-          MinVolumeHora: pickValue(snapshot.Resumo, "MinVolumeHora", "minVolumeHora"),
+          AtualizadoUtc: pickValue(resumo, "AtualizadoUtc", "atualizadoUtc"),
+          JogosAtivos: pickValue(resumo, "JogosAtivos", "jogosAtivos"),
+          ApostasPendentes: pickValue(resumo, "ApostasPendentes", "apostasPendentes"),
+          ApostasGanhas: pickValue(resumo, "ApostasGanhas", "apostasGanhas"),
+          VolumeTotalApostado: pickValue(resumo, "VolumeTotalApostado", "volumeTotalApostado"),
+          MargemPlataforma: pickValue(resumo, "MargemPlataforma", "margemPlataforma"),
+          UtilizadoresAtivos: pickValue(resumo, "UtilizadoresAtivos", "utilizadoresAtivos"),
+          ApostasPorMinuto: pickValue(resumo, "ApostasPorMinuto", "apostasPorMinuto"),
+          MediaMovel15MinVolume: pickValue(resumo, "MediaMovel15MinVolume", "mediaMovel15MinVolume"),
+          MaxVolumeHora: pickValue(resumo, "MaxVolumeHora", "maxVolumeHora"),
+          MinVolumeHora: pickValue(resumo, "MinVolumeHora", "minVolumeHora"),
         }
       : null,
-    Competicoes: Array.isArray(snapshot?.Competicoes)
-      ? snapshot.Competicoes.map((item) => ({
+    Competicoes: Array.isArray(competicoes)
+      ? competicoes.map((item) => ({
           Competicao: pickValue(item, "Competicao", "competicao"),
           MediaGolosPorJogo: pickValue(item, "MediaGolosPorJogo", "mediaGolosPorJogo"),
           VolumeTotalApostado: pickValue(item, "VolumeTotalApostado", "volumeTotalApostado"),
@@ -258,8 +267,8 @@ function normalizeDashboardSnapshot(snapshot) {
           AtualizadoUtc: pickValue(item, "AtualizadoUtc", "atualizadoUtc"),
         }))
       : [],
-    JanelasTemporais: Array.isArray(snapshot?.JanelasTemporais)
-      ? snapshot.JanelasTemporais.map((item) => ({
+    JanelasTemporais: Array.isArray(janelasTemporais)
+      ? janelasTemporais.map((item) => ({
           JanelaInicioUtc: pickValue(item, "JanelaInicioUtc", "janelaInicioUtc"),
           Apostas: pickValue(item, "Apostas", "apostas"),
           VolumeTotal: pickValue(item, "VolumeTotal", "volumeTotal"),
@@ -268,8 +277,8 @@ function normalizeDashboardSnapshot(snapshot) {
           MinAposta: pickValue(item, "MinAposta", "minAposta"),
         }))
       : [],
-    ExposicoesJogos: Array.isArray(snapshot?.ExposicoesJogos)
-      ? snapshot.ExposicoesJogos.map((item) => ({
+    ExposicoesJogos: Array.isArray(exposicoesJogos)
+      ? exposicoesJogos.map((item) => ({
           JogoId: pickValue(item, "JogoId", "jogoId"),
           CodigoJogo: pickValue(item, "CodigoJogo", "codigoJogo"),
           Competicao: pickValue(item, "Competicao", "competicao"),
@@ -279,8 +288,8 @@ function normalizeDashboardSnapshot(snapshot) {
           AtualizadoUtc: pickValue(item, "AtualizadoUtc", "atualizadoUtc"),
         }))
       : [],
-    TiposAposta: Array.isArray(snapshot?.TiposAposta)
-      ? snapshot.TiposAposta.map((item) => ({
+    TiposAposta: Array.isArray(tiposAposta)
+      ? tiposAposta.map((item) => ({
           TipoAposta: pickValue(item, "TipoAposta", "tipoAposta"),
           TotalApostas: pickValue(item, "TotalApostas", "totalApostas"),
           ApostasGanhas: pickValue(item, "ApostasGanhas", "apostasGanhas"),
@@ -290,8 +299,8 @@ function normalizeDashboardSnapshot(snapshot) {
           AtualizadoUtc: pickValue(item, "AtualizadoUtc", "atualizadoUtc"),
         }))
       : [],
-    Alertas: Array.isArray(snapshot?.Alertas)
-      ? snapshot.Alertas.map((item) => ({
+    Alertas: Array.isArray(alertas)
+      ? alertas.map((item) => ({
           Id: pickValue(item, "Id", "id"),
           Severidade: pickValue(item, "Severidade", "severidade"),
           Mensagem: pickValue(item, "Mensagem", "mensagem"),
@@ -300,8 +309,8 @@ function normalizeDashboardSnapshot(snapshot) {
           CriadoEmUtc: pickValue(item, "CriadoEmUtc", "criadoEmUtc"),
         }))
       : [],
-    EventosRecentes: Array.isArray(snapshot?.EventosRecentes)
-      ? snapshot.EventosRecentes.map((item) => ({
+    EventosRecentes: Array.isArray(eventosRecentes)
+      ? eventosRecentes.map((item) => ({
           EventSequence: pickValue(item, "EventSequence", "eventSequence"),
           EventId: pickValue(item, "EventId", "eventId"),
           EventType: pickValue(item, "EventType", "eventType"),
@@ -312,6 +321,22 @@ function normalizeDashboardSnapshot(snapshot) {
           CriadoEmUtc: pickValue(item, "CriadoEmUtc", "criadoEmUtc"),
         }))
       : [],
+  };
+}
+
+function normalizeStreamStatus(snapshot) {
+  if (!snapshot) {
+    return null;
+  }
+
+  return {
+    Broker: pickValue(snapshot, "Broker", "broker"),
+    Exchange: pickValue(snapshot, "Exchange", "exchange"),
+    StreamQueue: pickValue(snapshot, "StreamQueue", "streamQueue"),
+    LastEventSequence: pickValue(snapshot, "LastEventSequence", "lastEventSequence"),
+    ReplayCheckpoint: pickValue(snapshot, "ReplayCheckpoint", "replayCheckpoint"),
+    PendingEvents: pickValue(snapshot, "PendingEvents", "pendingEvents"),
+    AtualizadoUtc: pickValue(snapshot, "AtualizadoUtc", "atualizadoUtc"),
   };
 }
 
@@ -493,17 +518,19 @@ async function loadData() {
     requestJson(bettingBase, "/api/apostas").catch((error) => ({ __error: error, source: "bets" })),
     requestJson(bettingBase, "/api/utilizadores").catch((error) => ({ __error: error, source: "users" })),
     requestJson(bettingBase, "/api/analytics/dashboard").catch((error) => ({ __error: error, source: "dashboard" })),
+    requestJson(bettingBase, "/api/analytics/stream").catch((error) => ({ __error: error, source: "stream" })),
   ];
 
-  const [bettingGames, resultsGames, bets, users, dashboard] = await Promise.all(tasks);
+  const [bettingGames, resultsGames, bets, users, dashboard, stream] = await Promise.all(tasks);
 
   state.bettingGames = Array.isArray(bettingGames) ? bettingGames.map(normalizeBettingGame) : [];
   state.resultsGames = Array.isArray(resultsGames) ? resultsGames.map(normalizeFederationGame) : [];
   state.bets = Array.isArray(bets) ? bets.map(normalizeBet) : [];
   state.users = Array.isArray(users) ? users.map(normalizeUser) : [];
   state.dashboard = dashboard && !dashboard.__error ? normalizeDashboardSnapshot(dashboard) : null;
+  state.streamStatus = stream && !stream.__error ? normalizeStreamStatus(stream) : null;
 
-  const errors = [bettingGames, resultsGames, bets, users, dashboard].filter((item) => item && item.__error);
+  const errors = [bettingGames, resultsGames, bets, users, dashboard, stream].filter((item) => item && item.__error);
   if (errors.length > 0) {
     setConnectionState("partial");
     appendLog("warning", "Algumas consultas falharam", errors[0].__error?.message || "Erro inesperado.");
@@ -544,6 +571,7 @@ function setSectionMessage(id, message) {
 function renderAll() {
   renderSummary();
   renderDashboardPanel();
+  renderMiddlewarePanel();
   renderGames();
   renderBets();
   renderUsers();
@@ -887,6 +915,56 @@ function renderDashboardPanel() {
     : '<div class="feed-item"><strong>Sem eventos</strong><small>O stream ainda não foi preenchido.</small></div>';
 }
 
+function renderMiddlewarePanel() {
+  if (!elements.middlewareBroker) {
+    return;
+  }
+
+  const stream = state.streamStatus;
+  const eventCount = state.dashboard?.EventosRecentes?.length || 0;
+  const alertCount = state.dashboard?.Alertas?.length || 0;
+
+  if (!stream) {
+    elements.middlewareBroker.textContent = "offline";
+    elements.middlewareBrokerDetail.textContent = "Sem resposta de /api/analytics/stream.";
+    elements.middlewareLastSequence.textContent = "--";
+    elements.middlewareReplayCheckpoint.textContent = "--";
+    elements.middlewarePendingEvents.textContent = "--";
+    if (elements.middlewareEvidence) {
+      elements.middlewareEvidence.innerHTML = `
+        <div class="feed-item">
+          <strong>A aguardar stream</strong>
+          <small>Confirma se a Betting API, o SQL Server, o Kafka e o RabbitMQ estao ativos.</small>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  elements.middlewareBroker.textContent = stream.Broker || "RabbitMQ + Kafka";
+  elements.middlewareBrokerDetail.textContent = stream.Exchange || "betstrike.events / Kafka topics";
+  elements.middlewareLastSequence.textContent = String(stream.LastEventSequence ?? 0);
+  elements.middlewareReplayCheckpoint.textContent = String(stream.ReplayCheckpoint ?? 0);
+  elements.middlewarePendingEvents.textContent = String(stream.PendingEvents ?? 0);
+
+  if (elements.middlewareEvidence) {
+    elements.middlewareEvidence.innerHTML = `
+      <div class="feed-item">
+        <strong>Eventos recentes no dashboard</strong>
+        <small>${eventCount} eventos visiveis no snapshot atual. Ultima atualizacao: ${formatDate(stream.AtualizadoUtc)}</small>
+      </div>
+      <div class="feed-item">
+        <strong>Alertas automaticos</strong>
+        <small>${alertCount} alertas recentes. Usa uma aposta >= 100 EUR para provocar sinalizacao.</small>
+      </div>
+      <div class="feed-item">
+        <strong>Replay controlado</strong>
+        <small>Se pendentes for 0, o checkpoint esta alinhado com o stream persistido.</small>
+      </div>
+    `;
+  }
+}
+
 function appendLog(kind, title, detail) {
   const entry = document.createElement("div");
   entry.className = `log-entry ${kind}`;
@@ -1228,6 +1306,12 @@ function hydrateElements() {
     "dashboardMovingAverage",
     "dashboardPeakHour",
     "dashboardLowHour",
+    "middlewareBroker",
+    "middlewareBrokerDetail",
+    "middlewareLastSequence",
+    "middlewareReplayCheckpoint",
+    "middlewarePendingEvents",
+    "middlewareEvidence",
     "bettingGamesCount",
     "resultsGamesCount",
     "bettingGamesBody",

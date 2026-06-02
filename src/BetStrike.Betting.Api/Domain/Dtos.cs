@@ -123,3 +123,14 @@ public sealed class DashboardSnapshot
     public IReadOnlyList<DashboardAlerta> Alertas { get; set; } = Array.Empty<DashboardAlerta>();
     public IReadOnlyList<DashboardEvento> EventosRecentes { get; set; } = Array.Empty<DashboardEvento>();
 }
+
+public sealed class StreamStatusSnapshot
+{
+    public string Broker { get; set; } = "RabbitMQ + Kafka";
+    public string Exchange { get; set; } = "betstrike.events / Kafka topics: bets-events, game-events, analytics-events";
+    public string StreamQueue { get; set; } = "betstrike.analytics.stream";
+    public long LastEventSequence { get; set; }
+    public long ReplayCheckpoint { get; set; }
+    public long PendingEvents { get; set; }
+    public DateTime AtualizadoUtc { get; set; }
+}

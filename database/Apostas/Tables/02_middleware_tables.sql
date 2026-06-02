@@ -1,6 +1,9 @@
 USE Apostas;
 GO
 
+SET QUOTED_IDENTIFIER ON;
+GO
+
 IF OBJECT_ID('dbo.Evento_Middleware', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.Evento_Middleware

@@ -26,6 +26,32 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE dbo.sp_Apostas_ResolverApostas
+    @JogoId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @GolosCasa INT, @GolosFora INT;
+    SELECT @GolosCasa = GolosCasa, @GolosFora = GolosFora
+    FROM dbo.Resultado
+    WHERE JogoId = @JogoId;
+
+    IF @GolosCasa IS NULL OR @GolosFora IS NULL
+        THROW 51010, 'Resultado inexistente para resolver apostas.', 1;
+
+    UPDATE dbo.Aposta
+    SET Estado = CASE
+        WHEN TipoAposta = '1' AND @GolosCasa > @GolosFora THEN 2
+        WHEN TipoAposta = 'X' AND @GolosCasa = @GolosFora THEN 2
+        WHEN TipoAposta = '2' AND @GolosFora > @GolosCasa THEN 2
+        ELSE 3
+    END
+    WHERE JogoId = @JogoId
+      AND Estado = 1;
+END
+GO
+
 CREATE OR ALTER PROCEDURE dbo.sp_Apostas_AtualizarEstadoResultadoJogo
     @CodigoJogo VARCHAR(20),
     @Estado INT,
@@ -153,32 +179,6 @@ BEGIN
       AND a.UtilizadorId = @UtilizadorId
       AND a.Estado = 1
       AND j.Estado = 1;
-END
-GO
-
-CREATE OR ALTER PROCEDURE dbo.sp_Apostas_ResolverApostas
-    @JogoId INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    DECLARE @GolosCasa INT, @GolosFora INT;
-    SELECT @GolosCasa = GolosCasa, @GolosFora = GolosFora
-    FROM dbo.Resultado
-    WHERE JogoId = @JogoId;
-
-    IF @GolosCasa IS NULL OR @GolosFora IS NULL
-        THROW 51010, 'Resultado inexistente para resolver apostas.', 1;
-
-    UPDATE dbo.Aposta
-    SET Estado = CASE
-        WHEN TipoAposta = '1' AND @GolosCasa > @GolosFora THEN 2
-        WHEN TipoAposta = 'X' AND @GolosCasa = @GolosFora THEN 2
-        WHEN TipoAposta = '2' AND @GolosFora > @GolosCasa THEN 2
-        ELSE 3
-    END
-    WHERE JogoId = @JogoId
-      AND Estado = 1;
 END
 GO
 

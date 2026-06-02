@@ -22,6 +22,17 @@ BEGIN
 END
 GO
 
+IF COL_LENGTH('dbo.Jogo', 'Competicao') IS NULL
+BEGIN
+    ALTER TABLE dbo.Jogo
+        ADD Competicao NVARCHAR(100) NOT NULL
+            CONSTRAINT DF_Apostas_Jogo_Competicao DEFAULT(N'Liga BetStrike');
+
+    ALTER TABLE dbo.Jogo
+        DROP CONSTRAINT DF_Apostas_Jogo_Competicao;
+END
+GO
+
 IF OBJECT_ID('dbo.Resultado', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.Resultado

@@ -248,4 +248,25 @@ public sealed class BettingRepository(IConfiguration configuration) : IBettingRe
 
         return rows.ToList();
     }
+
+    public async Task<StreamStatusSnapshot> ObterStreamStatusAsync(CancellationToken ct)
+    {
+        using var db = Open();
+
+        var lastEventSequence = await db.QueryFirstOrDefaultAsync<long>(new CommandDefinition(
+            "SELECT COALESCE(MAX(EventSequence), 0) FROM dbo.Evento_Middleware",
+            cancellationToken: ct));
+
+        var replayCheckpoint = await db.QueryFirstOrDefaultAsync<long>(new CommandDefinition(
+            "SELECT COALESCE(MAX(LastEventSequence), 0) FROM dbo.Stream_ReplayCheckpoint",
+            cancellationToken: ct));
+
+        return new StreamStatusSnapshot
+        {
+            LastEventSequence = lastEventSequence,
+            ReplayCheckpoint = replayCheckpoint,
+            PendingEvents = Math.Max(0, lastEventSequence - replayCheckpoint),
+            AtualizadoUtc = DateTime.UtcNow
+        };
+    }
 }

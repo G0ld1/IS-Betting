@@ -1,6 +1,7 @@
 using BetStrike.Betting.Api.Application;
 using BetStrike.Betting.Api.Infrastructure;
 using MassTransit;
+using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IBettingRepository, BettingRepository>();
 builder.Services.AddScoped<IBettingService, BettingService>();
+builder.Services.AddSingleton<IKafkaEventPublisher, KafkaEventPublisher>();
 builder.Services.AddMassTransit(busConfigurator =>
 {
 	busConfigurator.UsingRabbitMq((context, cfg) =>
@@ -41,6 +43,40 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("LocalFrontend");
+
+app.MapGet("/health/live", () => Results.Ok(new
+{
+	service = "BetStrike.Betting.Api",
+	status = "ok",
+	timestampUtc = DateTime.UtcNow
+}));
+
+app.MapGet("/health/ready", async (IConfiguration configuration, CancellationToken ct) =>
+{
+	var connectionString = configuration.GetConnectionString("ApostasDb");
+	if (string.IsNullOrWhiteSpace(connectionString))
+	{
+		return Results.Problem("Connection string ApostasDb não configurada.", statusCode: StatusCodes.Status503ServiceUnavailable);
+	}
+
+	try
+	{
+		await using var connection = new SqlConnection(connectionString);
+		await connection.OpenAsync(ct);
+		return Results.Ok(new
+		{
+			service = "BetStrike.Betting.Api",
+			status = "ready",
+			database = "ok",
+			broker = "RabbitMQ",
+			timestampUtc = DateTime.UtcNow
+		});
+	}
+	catch (Exception ex)
+	{
+		return Results.Problem(ex.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
+	}
+});
 
 app.MapControllers();
 app.Run();

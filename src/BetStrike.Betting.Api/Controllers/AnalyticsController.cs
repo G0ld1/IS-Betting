@@ -19,4 +19,8 @@ public sealed class AnalyticsController(IBettingService service) : ControllerBas
     [HttpGet("events")]
     public async Task<ActionResult<IReadOnlyList<DashboardEvento>>> Eventos([FromQuery] int? limite, CancellationToken ct)
         => Ok(await service.ListarEventosAsync(Math.Clamp(limite ?? 20, 1, 100), ct));
+
+    [HttpGet("stream")]
+    public async Task<ActionResult<StreamStatusSnapshot>> Stream(CancellationToken ct)
+        => Ok(await service.ObterStreamStatusAsync(ct));
 }

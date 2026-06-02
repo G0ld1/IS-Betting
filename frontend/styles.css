@@ -367,7 +367,8 @@ h1 {
 .log-card,
 .settings-card,
 .metrics-card,
-.analytics-card {
+.analytics-card,
+.middleware-card {
   grid-column: 1 / -1;
 }
 
@@ -489,6 +490,82 @@ textarea:focus {
 .analytics-card {
   display: grid;
   gap: 18px;
+}
+
+.middleware-card {
+  display: grid;
+  gap: 18px;
+}
+
+.topology-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.topology-node {
+  position: relative;
+  min-height: 150px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(173, 191, 255, 0.14);
+  background: rgba(7, 12, 22, 0.58);
+  overflow: hidden;
+}
+
+.topology-node::after {
+  content: "";
+  position: absolute;
+  inset: auto 16px 16px auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.16;
+}
+
+.topology-node.producer {
+  color: var(--accent-2);
+}
+
+.topology-node.stream {
+  color: var(--accent);
+}
+
+.topology-node.queue {
+  color: var(--accent-3);
+}
+
+.topology-node.consumer {
+  color: var(--accent-4);
+}
+
+.topology-node strong {
+  display: block;
+  margin: 6px 0 10px;
+  color: var(--text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.15rem;
+}
+
+.topology-node small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.middleware-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.middleware-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.evidence-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .analytics-banner {
@@ -751,7 +828,10 @@ tbody tr:hover td {
   .settings-form,
   .form-grid,
   .metrics-grid,
-  .analytics-grid {
+  .analytics-grid,
+  .topology-grid,
+  .middleware-grid,
+  .evidence-list {
     grid-template-columns: 1fr;
   }
 

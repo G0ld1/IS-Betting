@@ -1,5 +1,35 @@
 # Execução — Parte 1
 
+## Parte 2
+
+O cenário da Parte 2 usa os mesmos serviços base e acrescenta o middleware assíncrono com RabbitMQ, replay persistido e dashboard analítico.
+
+### Componentes relevantes
+
+- RabbitMQ em `localhost:5672` e UI em `localhost:15672`.
+- `BetStrike.Middleware.Worker` para consumo de eventos, alertas e refresh do dashboard.
+- `Apostas.dbo.Evento_Middleware` como stream persistido.
+- `Apostas.dbo.Stream_ReplayCheckpoint` para reprocessamento controlado.
+- `GET http://localhost:5002/api/analytics/dashboard` para validação do snapshot.
+- `GET http://localhost:5002/api/analytics/stream` para inspecionar o estado do stream e do replay.
+- `GET http://localhost:5001/health/ready` e `GET http://localhost:5002/health/ready` para readiness.
+
+### Validação manual rápida
+
+1. Subir a infraestrutura com `docker compose up --build`.
+2. Gerar demo com `powershell -ExecutionPolicy Bypass -File .\scripts\demo_rapida.ps1` ou criar eventos manualmente.
+3. Confirmar que o worker atualiza o dashboard e regista alertas.
+4. Repetir a execução do worker para validar replay controlado por checkpoint.
+5. Abrir o frontend em `http://localhost:8080` e confirmar o painel de analytics.
+
+### O que demonstrar na entrega
+
+- envio de eventos entre APIs e middleware;
+- reprocessamento histórico com checkpoint;
+- alertas gerados pelo stream;
+- dashboard com métricas quase em tempo real;
+- execução containerizada completa.
+
 ## Criação Rápida de base de Dados 
 
 Para criação de bases de dados e arranque das APIs, use:

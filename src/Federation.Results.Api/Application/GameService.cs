@@ -1,10 +1,15 @@
 using Federation.Results.Api.Domain;
+using Federation.Results.Api.Infrastructure;
 using BetStrike.Middleware.Contracts;
 using MassTransit;
 
 namespace Federation.Results.Api.Application;
 
-public sealed class GameService(IGameRepository repository, IPublishEndpoint publishEndpoint, ILogger<GameService> logger) : IGameService
+public sealed class GameService(
+    IGameRepository repository,
+    IPublishEndpoint publishEndpoint,
+    IKafkaEventPublisher kafkaEventPublisher,
+    ILogger<GameService> logger) : IGameService
 {
     public async Task<int> CreateAsync(CreateGameRequest request, CancellationToken ct)
     {
@@ -48,7 +53,7 @@ public sealed class GameService(IGameRepository repository, IPublishEndpoint pub
     }
 
     private async Task PublishSafelyAsync<T>(T message, CancellationToken ct)
-        where T : class
+        where T : class, IPlatformEvent
     {
         try
         {
@@ -57,6 +62,15 @@ public sealed class GameService(IGameRepository repository, IPublishEndpoint pub
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Falha ao publicar evento {EventType} no broker.", typeof(T).Name);
+        }
+
+        try
+        {
+            await kafkaEventPublisher.PublishAsync(message, ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Falha ao publicar evento {EventType} no Kafka.", typeof(T).Name);
         }
     }
 }
