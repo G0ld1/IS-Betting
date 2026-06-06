@@ -85,7 +85,7 @@ O frontend acede aos dados dos jogos e das apostas através das APIs em 5001 e 5
 ### Arquitetura lógica
 
 - Produtores de eventos: `BetStrike.Betting.Api` e `Federation.Results.Api`.
-- Camada de filas: `BetStrike.Middleware.Worker` com MassTransit sobre RabbitMQ, retries, redelivery, prioridades e DLQ.
+- Camada de filas: `BetStrike.Middleware.Worker` com MassTransit sobre RabbitMQ, retries com intervalos, prioridades e DLQ.
 - Camada de streaming: Apache Kafka com topics `bets-events`, `game-events` e `analytics-events`, produzidas pelas APIs e consumidas por `BetStrike.Streaming.Worker`.
 - Persistência do stream: `Apostas.dbo.Evento_Middleware` e `Apostas.dbo.Stream_ReplayCheckpoint`.
 - Camada analítica: tabelas `Dashboard_*` em SQL Server, recalculadas pelo worker.
@@ -98,7 +98,7 @@ O frontend acede aos dados dos jogos e das apostas através das APIs em 5001 e 5
 - desacoplamento entre produtor e consumidor via RabbitMQ e Kafka;
 - múltiplos consumidores sobre o mesmo fluxo de eventos;
 - processamento assíncrono para alertas e refresh do dashboard;
-- retries, redelivery e dead-letter queues;
+- retries com intervalos e dead-letter queues;
 - replay histórico com checkpoint;
 - métricas agregadas para dashboard e alertas automáticos.
 

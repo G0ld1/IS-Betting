@@ -45,6 +45,18 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
+    BEGIN TRANSACTION;
+
+    DECLARE @LockResult INT;
+    EXEC @LockResult = sys.sp_getapplock
+        @Resource = 'BetStrike.Dashboard.Rebuild',
+        @LockMode = 'Exclusive',
+        @LockOwner = 'Transaction',
+        @LockTimeout = 30000;
+
+    IF @LockResult < 0
+        THROW 51000, 'Nao foi possivel obter o lock para recalcular o dashboard.', 1;
+
     DECLARE @AgoraUtc DATETIME2(0) = SYSUTCDATETIME();
     DECLARE @Corte24h DATETIME2(0) = DATEADD(DAY, -1, @AgoraUtc);
     DECLARE @Corte1h DATETIME2(0) = DATEADD(HOUR, -1, @AgoraUtc);
@@ -249,6 +261,8 @@ BEGIN
         VolumeTotal,
         @AgoraUtc
     FROM TiposAposta;
+
+    COMMIT TRANSACTION;
 END
 GO
 

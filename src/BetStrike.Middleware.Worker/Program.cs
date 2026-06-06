@@ -28,9 +28,11 @@ builder.Services.AddMassTransit(busConfigurator =>
         cfg.ReceiveEndpoint(MiddlewareTopology.StreamQueue, endpoint =>
         {
             endpoint.PrefetchCount = 16;
-            endpoint.UseMessageRetry(retry => retry.Interval(3, TimeSpan.FromSeconds(2)));
-            endpoint.UseDelayedRedelivery(retry => retry.Intervals(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(15)));
-            endpoint.UseInMemoryOutbox();
+            endpoint.UseMessageRetry(retry => retry.Intervals(
+                TimeSpan.FromSeconds(2),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(15)));
+            endpoint.UseInMemoryOutbox(context);
             endpoint.SetQueueArgument("x-dead-letter-exchange", "");
             endpoint.SetQueueArgument("x-dead-letter-routing-key", MiddlewareTopology.StreamDeadLetterQueue);
             endpoint.ConfigureConsumer<PlatformEventConsumer>(context);
@@ -44,9 +46,13 @@ builder.Services.AddMassTransit(busConfigurator =>
         cfg.ReceiveEndpoint(MiddlewareTopology.HighPriorityAnalyticsQueue, endpoint =>
         {
             endpoint.PrefetchCount = 4;
-            endpoint.UseMessageRetry(retry => retry.Interval(5, TimeSpan.FromSeconds(3)));
-            endpoint.UseDelayedRedelivery(retry => retry.Intervals(TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1)));
-            endpoint.UseInMemoryOutbox();
+            endpoint.UseMessageRetry(retry => retry.Intervals(
+                TimeSpan.FromSeconds(3),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromMinutes(1)));
+            endpoint.UseInMemoryOutbox(context);
             endpoint.SetQueueArgument("x-dead-letter-exchange", "");
             endpoint.SetQueueArgument("x-dead-letter-routing-key", MiddlewareTopology.HighPriorityAnalyticsDeadLetterQueue);
             endpoint.ConfigureConsumer<DashboardRefreshConsumer>(context);
@@ -60,9 +66,13 @@ builder.Services.AddMassTransit(busConfigurator =>
         cfg.ReceiveEndpoint(MiddlewareTopology.LowPriorityAnalyticsQueue, endpoint =>
         {
             endpoint.PrefetchCount = 2;
-            endpoint.UseMessageRetry(retry => retry.Interval(5, TimeSpan.FromSeconds(5)));
-            endpoint.UseDelayedRedelivery(retry => retry.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5)));
-            endpoint.UseInMemoryOutbox();
+            endpoint.UseMessageRetry(retry => retry.Intervals(
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(15),
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(2)));
+            endpoint.UseInMemoryOutbox(context);
             endpoint.SetQueueArgument("x-dead-letter-exchange", "");
             endpoint.SetQueueArgument("x-dead-letter-routing-key", MiddlewareTopology.LowPriorityAnalyticsDeadLetterQueue);
             endpoint.ConfigureConsumer<DashboardRefreshConsumer>(context);
